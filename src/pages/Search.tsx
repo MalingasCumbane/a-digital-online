@@ -5,7 +5,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search as SearchIcon, User, Loader2 } from 'lucide-react';
+import { Search as SearchIcon, User, Loader2, FileText } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 // Mock citizen data

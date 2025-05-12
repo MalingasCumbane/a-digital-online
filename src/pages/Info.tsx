@@ -2,9 +2,9 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Info, Download, File, Search } from 'lucide-react';
+import { FileText, Info as InfoIcon, Download, File, Search, User } from 'lucide-react';
 
-const Info = () => {
+const InfoPage = () => {
   return (
     <DashboardLayout>
       <div>
@@ -29,7 +29,7 @@ const Info = () => {
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full">
-                <Info className="mr-2 h-4 w-4" /> Saiba Mais
+                <InfoIcon className="mr-2 h-4 w-4" /> Saiba Mais
               </Button>
             </CardFooter>
           </Card>
@@ -69,7 +69,7 @@ const Info = () => {
             </CardContent>
             <CardFooter>
               <Button variant="outline" className="w-full">
-                <Info className="mr-2 h-4 w-4" /> Ver FAQ
+                <InfoIcon className="mr-2 h-4 w-4" /> Ver FAQ
               </Button>
             </CardFooter>
           </Card>
@@ -159,4 +159,4 @@ const Info = () => {
   );
 };
 
-export default Info;
+export default InfoPage;
