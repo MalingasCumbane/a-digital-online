@@ -1,7 +1,6 @@
+
 #root {
-  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
   text-align: center;
 }
 
@@ -40,3 +39,14 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Animações para cards e transições */
+.gov-card {
+  transition: all 0.3s ease;
+}
+
+.gov-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+}
+
