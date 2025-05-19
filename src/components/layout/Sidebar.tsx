@@ -18,7 +18,7 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-0 flex flex-col bg-sidebar shadow-xl transition-all duration-300 ease-in-out",
+        "fixed inset-y-0 left-0 flex flex-col bg-sidebar shadow-xl transition-all duration-300 ease-in-out z-50",
         isOpen ? "w-64" : "w-[70px]"
       )}
     >
