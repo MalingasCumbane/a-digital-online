@@ -27,8 +27,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         <Header />
         <div className="flex flex-1 overflow-hidden relative">
           <Sidebar />
-          <main className="flex-1 overflow-auto transition-all duration-300 w-full ml-0 md:ml-[70px] bg-gray-50" style={{ zIndex: 0 }}>
-            <div className="container mx-auto py-8 px-6">
+          <main className="flex-1 overflow-auto transition-all duration-300 w-full ml-0 sm:ml-[70px] bg-gray-50" style={{ zIndex: 0 }}>
+            <div className="container mx-auto py-4 sm:py-6 md:py-8 px-3 sm:px-4 md:px-6">
               {children}
             </div>
             <Footer />

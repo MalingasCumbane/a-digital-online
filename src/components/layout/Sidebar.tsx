@@ -19,7 +19,9 @@ const Sidebar = () => {
     <aside
       className={cn(
         "fixed inset-y-0 left-0 flex flex-col bg-sidebar shadow-xl transition-all duration-300 ease-in-out z-50",
-        isOpen ? "w-64" : "w-[70px]"
+        isOpen ? "w-64" : "w-[70px]",
+        "transform sm:translate-x-0 transition-transform",
+        !isOpen && "-translate-x-full sm:translate-x-0"
       )}
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
