@@ -10,9 +10,9 @@ import { useToast } from '@/components/ui/use-toast';
 
 // Mock citizen data
 const mockCitizens = [
-  { id: '123456789', name: 'João Silva', dob: '1985-05-15', address: 'Av. da Liberdade, 123, Lisboa' },
-  { id: '987654321', name: 'Maria Santos', dob: '1990-10-25', address: 'Rua Augusta, 45, Lisboa' },
-  { id: '456789123', name: 'António Ferreira', dob: '1978-03-08', address: 'Praça do Comércio, 7, Lisboa' },
+  { id: '123456789', name: 'João Silva', dob: '1985-05-15', address: 'Av. da Liberdade, 123, Maputo' },
+  { id: '987654321', name: 'Maria Santos', dob: '1990-10-25', address: 'Rua Augusta, 45, Maputo' },
+  { id: '456789123', name: 'António Ferreira', dob: '1978-03-08', address: 'Praça do Comércio, 7, Maputo' },
 ];
 
 const Search = () => {
