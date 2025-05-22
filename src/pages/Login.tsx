@@ -19,10 +19,13 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/login/', {
-        email,
-        password
-      });
+      const data = {
+        user_name: email,
+        password: password
+      }
+
+      console.log("data: ", data)
+      const response = await api.post('/login/', data);
 
       // Armazena o token e os dados do usuário
       localStorage.setItem('token', response.data.token);
