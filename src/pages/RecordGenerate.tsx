@@ -371,3 +371,4 @@ const RecordGenerate = () => {
 };
 
 export default RecordGenerate;
+

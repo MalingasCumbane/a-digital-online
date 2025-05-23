@@ -25,42 +25,6 @@ const Search = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // const handleSearch = (e: React.FormEvent) => {
-  //   e.preventDefault();
-    
-  //   if (!searchQuery.trim()) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Erro na pesquisa",
-  //       description: "Por favor, insira um termo de pesquisa válido.",
-  //     });
-  //     return;
-  //   }
-
-  //   setIsSearching(true);
-  //   setHasSearched(true);
-
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     const results = mockCitizens.filter(citizen => {
-  //       if (searchType === 'id') {
-  //         return citizen.id.includes(searchQuery);
-  //       } else {
-  //         return citizen.name.toLowerCase().includes(searchQuery.toLowerCase());
-  //       }
-  //     });
-      
-  //     setSearchResults(results);
-  //     setIsSearching(false);
-
-  //     if (results.length === 0) {
-  //       toast({
-  //         title: "Sem resultados",
-  //         description: "Nenhum cidadão encontrado com os critérios especificados.",
-  //       });
-  //     }
-  //   }, 1000);
-  // };
 
     const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,7 +184,7 @@ const Search = () => {
                         className="mt-2 md:mt-0 bg-gov-accent hover:bg-gov-accent/90"
                       >
                         <FileText className="mr-2 h-4 w-4" />
-                        Gerar Registro
+                        Gerar Registo
                       </Button>
                     </div>
                   ))}
