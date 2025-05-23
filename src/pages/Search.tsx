@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search as SearchIcon, User, Loader2, FileText } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import api from '@/lib/api';
 
 // Mock citizen data
 const mockCitizens = [
@@ -24,7 +25,44 @@ const Search = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSearch = (e: React.FormEvent) => {
+  // const handleSearch = (e: React.FormEvent) => {
+  //   e.preventDefault();
+    
+  //   if (!searchQuery.trim()) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Erro na pesquisa",
+  //       description: "Por favor, insira um termo de pesquisa válido.",
+  //     });
+  //     return;
+  //   }
+
+  //   setIsSearching(true);
+  //   setHasSearched(true);
+
+  //   // Simulate API call
+  //   setTimeout(() => {
+  //     const results = mockCitizens.filter(citizen => {
+  //       if (searchType === 'id') {
+  //         return citizen.id.includes(searchQuery);
+  //       } else {
+  //         return citizen.name.toLowerCase().includes(searchQuery.toLowerCase());
+  //       }
+  //     });
+      
+  //     setSearchResults(results);
+  //     setIsSearching(false);
+
+  //     if (results.length === 0) {
+  //       toast({
+  //         title: "Sem resultados",
+  //         description: "Nenhum cidadão encontrado com os critérios especificados.",
+  //       });
+  //     }
+  //   }, 1000);
+  // };
+
+    const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!searchQuery.trim()) {
@@ -39,26 +77,36 @@ const Search = () => {
     setIsSearching(true);
     setHasSearched(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const results = mockCitizens.filter(citizen => {
-        if (searchType === 'id') {
-          return citizen.id.includes(searchQuery);
-        } else {
-          return citizen.name.toLowerCase().includes(searchQuery.toLowerCase());
+    try {
+      const response = await api.get('/cidadaos/search/', {
+        params: {
+          q: searchQuery,
+          type: searchType === 'id' ? 'bi' : 'nome'
         }
       });
-      
-      setSearchResults(results);
-      setIsSearching(false);
 
-      if (results.length === 0) {
+      setSearchResults(response.data.results.map(c => ({
+        id: c.numero_bi_nuit,
+        name: c.full_name,
+        dob: c.data_nascimento,
+        address: `${c.endereco}, ${c.distrito}, ${c.provincia}`
+      })));
+
+      if (response.data.count === 0) {
         toast({
           title: "Sem resultados",
           description: "Nenhum cidadão encontrado com os critérios especificados.",
         });
       }
-    }, 1000);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro na pesquisa",
+        description: "Ocorreu um erro ao pesquisar. Tente novamente.",
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleGenerateRecord = (citizenId: string) => {
