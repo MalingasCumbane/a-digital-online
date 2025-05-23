@@ -24,3 +24,40 @@ api.interceptors.request.use((config) => {
 
 
 export default api;
+
+export const CriminalRecordsService = {
+  getAllRecords: async (searchTerm = '') => {
+    try {
+      const params = {};
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+      const response = await api.get('/records/', { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching records:', error);
+      throw error;
+    }
+  },
+
+  getRecordStats: async () => {
+    try {
+      const response = await api.get('/records/stats/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching record stats:', error);
+      throw error;
+    }
+  },
+
+  generateRecord: async (citizenId) => {
+    try {
+      // This would be your endpoint to generate a new record
+      const response = await api.post('/records/generate/', { citizen_id: citizenId });
+      return response.data;
+    } catch (error) {
+      console.error('Error generating record:', error);
+      throw error;
+    }
+  }
+};
