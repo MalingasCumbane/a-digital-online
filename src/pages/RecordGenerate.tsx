@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -5,22 +6,21 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { FileText, Printer, Download, Check, X, Loader2 } from 'lucide-react';
+import { FileText, Printer, Download, Check, X, Loader2, RefreshCw } from 'lucide-react';
 import api from '@/lib/api';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
-import { Dialog,
+import {
+  Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogFooter,
- } from '@/components/ui/dialog';
+} from '@/components/ui/dialog';
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-
 
 const RecordGenerate = () => {
   const { id } = useParams();
@@ -31,11 +31,11 @@ const RecordGenerate = () => {
   const [request, setRequest] = useState<any>(null);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [formData, setFormData] = useState({
-      finalidade: 'EMPREGO',
-      agencia: '',
-      forma_pagamento: 'MBWAY',
-      observacoes: ''
-    });
+    finalidade: 'EMPREGO',
+    agencia: '',
+    forma_pagamento: 'MBWAY',
+    observacoes: ''
+  });
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -49,7 +49,10 @@ const RecordGenerate = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [citizenRes, registrosRes] = await Promise.all([ api.get(`/pesquisar/cidadaos/${id}/`), api.get(`/cidadaos/${id}/registros/`)]);
+        const [citizenRes, registrosRes] = await Promise.all([
+          api.get(`/pesquisar/cidadaos/${id}/`),
+          api.get(`/cidadaos/${id}/registos/`)
+        ]);
 
         setCitizen({
           ...citizenRes.data,
@@ -57,15 +60,23 @@ const RecordGenerate = () => {
           recordDetails: registrosRes.data
         });
 
-        // Check for existing request
+        // Verifica solicitação existente com certificado
         try {
-          const requestRes = await api.get(`/solicitacoes/?cidadao=${id}`);
+          const requestRes = await api.get(`/solicitacoes/?cidadao=${id}&expand=certificado`);
           if (requestRes.data.length > 0) {
-            setRequest(requestRes.data[0]);
+            const requestData = requestRes.data[0];
+            setRequest(requestData);
             
-            // Check for existing certificate
-            if (requestRes.data[0].certificado) {
-              setCertificate(requestRes.data[0].certificado);
+            if (requestData.certificado) {
+              // Se a API já retornou o certificado expandido
+              if (typeof requestData.certificado === 'object') {
+                setCertificate(requestData.certificado);
+              } 
+              // Se for apenas uma referência (ID)
+              else {
+                const certResponse = await api.get(`/certificados/${requestData.certificado}/`);
+                setCertificate(certResponse.data);
+              }
             }
           }
         } catch (error) {
@@ -90,21 +101,38 @@ const RecordGenerate = () => {
     try {
       const response = await api.post('/solicitacoes/', {
         cidadao: citizen.id,
-        finalidade: 'EMPREGO',
-        agencia: 'Agência Central',
-        forma_pagamento: 'MBWAY'
+        finalidade: formData.finalidade,
+        agencia: formData.agencia,
+        forma_pagamento: formData.forma_pagamento,
+        observacoes: formData.observacoes
       });
-      setRequest("");
+      
+      // Busca a solicitação completa com relacionamentos
+      const requestWithCert = await api.get(`/solicitacoes/${response.data.id}/?expand=certificado`);
+      setRequest(requestWithCert.data);
+      
+      // Se já existir certificado, carrega ele também
+      if (requestWithCert.data.certificado) {
+        if (typeof requestWithCert.data.certificado === 'object') {
+          setCertificate(requestWithCert.data.certificado);
+        } else {
+          const certResponse = await api.get(`/certificados/${requestWithCert.data.certificado}/`);
+          setCertificate(certResponse.data);
+        }
+      }
+      
       toast({
         title: "Solicitação criada",
         description: "Solicitação de registro criada com sucesso.",
       });
+      setIsRequestModalOpen(false);
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Falha ao criar solicitação.",
+        description: error.response?.data?.message || "Falha ao criar solicitação.",
       });
+      setIsRequestModalOpen(false);
     }
   };
 
@@ -118,7 +146,7 @@ const RecordGenerate = () => {
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
     // Header
-    page.drawText('REPÚBLICA PORTUGUESA', {
+    page.drawText('REPÚBLICA DE MOÇAMBIQUE', {
       x: 50,
       y: height - 50,
       size: 16,
@@ -143,13 +171,13 @@ const RecordGenerate = () => {
 
     // Citizen data
     let y = height - 180;
-    page.drawText(`Nome: ${citizen.name}`, { x: 50, y, size: fontSize, font });
+    page.drawText(`Nome: ${citizen.full_name}`, { x: 50, y, size: fontSize, font });
     y -= 20;
-    page.drawText(`BI/NUIT: ${citizen.id}`, { x: 50, y, size: fontSize, font });
+    page.drawText(`BI/NUIT: ${citizen.numero_bi_nuit}`, { x: 50, y, size: fontSize, font });
     y -= 20;
-    page.drawText(`Data Nascimento: ${citizen.dob}`, { x: 50, y, size: fontSize, font });
+    page.drawText(`Data Nascimento: ${citizen.data_nascimento}`, { x: 50, y, size: fontSize, font });
     y -= 20;
-    page.drawText(`Endereço: ${citizen.address}`, { x: 50, y, size: fontSize, font });
+    page.drawText(`Endereço: ${citizen.endereco}`, { x: 50, y, size: fontSize, font });
     y -= 40;
 
     // Result
@@ -168,15 +196,15 @@ const RecordGenerate = () => {
       y -= 20;
 
       citizen.recordDetails.forEach((record: any) => {
-        page.drawText(`Processo: ${record.case}`, { x: 60, y, size: fontSize, font });
+        page.drawText(`Processo: ${record.numero_processo}`, { x: 60, y, size: fontSize, font });
         y -= 15;
-        page.drawText(`Tribunal: ${record.court}`, { x: 60, y, size: fontSize, font });
+        page.drawText(`Tribunal: ${record.tribunal}`, { x: 60, y, size: fontSize, font });
         y -= 15;
-        page.drawText(`Infração: ${record.offense}`, { x: 60, y, size: fontSize, font });
+        page.drawText(`Infração: ${record.tipo_ocorrencia}`, { x: 60, y, size: fontSize, font });
         y -= 15;
-        page.drawText(`Sentença: ${record.sentence}`, { x: 60, y, size: fontSize, font });
+        page.drawText(`Sentença: ${record.setenca}`, { x: 60, y, size: fontSize, font });
         y -= 15;
-        page.drawText(`Data: ${record.date}`, { x: 60, y, size: fontSize, font });
+        page.drawText(`Data: ${record.data_ocorrencia}`, { x: 60, y, size: fontSize, font });
         y -= 25;
       });
     } else {
@@ -245,7 +273,11 @@ const RecordGenerate = () => {
         }
       });
       
+      // Atualiza a solicitação para incluir referência ao certificado
+      const updatedRequest = await api.get(`/solicitacoes/${request.id}/?expand=certificado`);
+      setRequest(updatedRequest.data);
       setCertificate(response.data);
+      
       toast({
         title: "Certificado gerado",
         description: "O certificado foi gerado com sucesso.",
@@ -254,7 +286,7 @@ const RecordGenerate = () => {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Falha ao gerar certificado.",
+        description: error.response?.data?.message || "Falha ao gerar certificado.",
       });
     } finally {
       setGenerating(false);
@@ -282,7 +314,7 @@ const RecordGenerate = () => {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Falha ao imprimir documento.",
+        description: error.response?.data?.message || "Falha ao imprimir documento.",
       });
     }
   };
@@ -293,7 +325,6 @@ const RecordGenerate = () => {
       [name]: value
     }));
   };
-
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -316,10 +347,11 @@ const RecordGenerate = () => {
       
       const a = document.createElement('a');
       a.href = pdfUrl;
-      a.download = `certificado-${citizen.id}.pdf`;
+      a.download = `certificado-${citizen.numero_bi_nuit}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      window.URL.revokeObjectURL(pdfUrl);
       
       toast({
         title: "Download iniciado",
@@ -329,7 +361,26 @@ const RecordGenerate = () => {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Falha ao baixar documento.",
+        description: error.response?.data?.message || "Falha ao baixar documento.",
+      });
+    }
+  };
+
+  const handleRefreshCertificate = async () => {
+    if (!certificate) return;
+    
+    try {
+      const response = await api.get(`/certificados/${certificate.id}/`);
+      setCertificate(response.data);
+      toast({
+        title: "Certificado atualizado",
+        description: "Os dados do certificado foram atualizados.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: error.response?.data?.message || "Falha ao recarregar certificado.",
       });
     }
   };
@@ -403,7 +454,7 @@ const RecordGenerate = () => {
                         <div className="bg-green-100 p-1 rounded-full">
                           <Check className="h-4 w-4 text-green-600" />
                         </div>
-                          <span className="text-green-600 font-medium">Com Registros Criminais</span>
+                        <span className="text-green-600 font-medium">Com Registros Criminais</span>
                       </>
                     ) : (
                       <>
@@ -453,150 +504,156 @@ const RecordGenerate = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 border-t flex justify-end gap-3">
             {!request ? (
-              <>
               <Button 
-                // onClick={handleCreateRequest} 
-                                  onClick={() => setIsRequestModalOpen(true)} 
-
+                onClick={() => setIsRequestModalOpen(true)} 
                 className="bg-gov-primary hover:bg-gov-secondary"
               >
                 Criar Solicitação
               </Button>
-              
-              <Dialog open={isRequestModalOpen} onOpenChange={setIsRequestModalOpen}>
-                  <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                      <DialogTitle>Criar Nova Solicitação</DialogTitle>
-                      <DialogDescription>
-                        Preencha os detalhes da solicitação para o cidadão {citizen.full_name}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="finalidade" className="text-right">
-                          Finalidade
-                        </Label>
-                        <Select 
-                          value={formData.finalidade} 
-                          onValueChange={(value) => handleSelectChange('finalidade', value)}
-                        >
-                          <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Selecione a finalidade" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="EMPREGO">Emprego</SelectItem>
-                            <SelectItem value="VIAGEM">Viagem</SelectItem>
-                            <SelectItem value="OUTRO">Outro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="agencia" className="text-right">
-                          Agência
-                        </Label>
-                        <Input
-                          id="agencia"
-                          name="agencia"
-                          value={formData.agencia}
-                          onChange={handleInputChange}
-                          className="col-span-3"
-                          required
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="forma_pagamento" className="text-right">
-                          Forma de Pagamento
-                        </Label>
-                        <Select 
-                          value={formData.forma_pagamento} 
-                          onValueChange={(value) => handleSelectChange('forma_pagamento', value)}
-                        >
-                          <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Selecione a forma de pagamento" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="MBWAY">MBWay</SelectItem>
-                            <SelectItem value="TRANSFERENCIA">Transferência Bancária</SelectItem>
-                            <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="observacoes" className="text-right">
-                          Observações
-                        </Label>
-                        <Textarea
-                          id="observacoes"
-                          name="observacoes"
-                          value={formData.observacoes}
-                          onChange={handleInputChange}
-                          className="col-span-3"
-                          rows={3}
-                        />
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button 
-                        type="button" 
-                        variant="outline" 
-                        onClick={() => setIsRequestModalOpen(false)}
-                      >
-                        Cancelar
-                      </Button>
-                      <Button 
-                        type="button" 
-                        className="bg-gov-primary hover:bg-gov-secondary"
-                        onClick={handleCreateRequest}
-                      >
-                        Criar Solicitação
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-
-              
-              </>
-            ) : !certificate ? (
-              <Button 
-                onClick={handleGenerateCertificate} 
-                className="bg-gov-primary hover:bg-gov-secondary"
-                disabled={generating}
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    A gerar documento...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Gerar Documento PDF
-                  </>
-                )}
-              </Button>
             ) : (
               <>
-                <Button 
-                  variant="outline"
-                  onClick={handleDownload}
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  Baixar PDF
-                </Button>
-                <Button 
-                  onClick={handlePrint}
-                  className="bg-gov-primary hover:bg-gov-secondary"
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  Imprimir Documento
-                </Button>
+                {!certificate ? (
+                  <Button 
+                    onClick={handleGenerateCertificate} 
+                    className="bg-gov-primary hover:bg-gov-secondary"
+                    disabled={generating}
+                  >
+                    {generating ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        A gerar documento...
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Gerar Documento PDF
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <>
+                    <Button 
+                      variant="outline"
+                      onClick={handleDownload}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Baixar PDF
+                    </Button>
+                    <Button 
+                      onClick={handlePrint}
+                      className="bg-gov-primary hover:bg-gov-secondary"
+                    >
+                      <Printer className="mr-2 h-4 w-4" />
+                      Imprimir Documento
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={handleRefreshCertificate}
+                    >
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Atualizar
+                    </Button>
+                  </>
+                )}
               </>
             )}
           </CardFooter>
         </Card>
+
+        {/* Modal de Criação de Solicitação */}
+        <Dialog open={isRequestModalOpen} onOpenChange={setIsRequestModalOpen}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Criar Nova Solicitação</DialogTitle>
+              <DialogDescription>
+                Preencha os detalhes da solicitação para o cidadão {citizen.full_name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="finalidade" className="text-right">
+                  Finalidade
+                </Label>
+                <Select 
+                  value={formData.finalidade} 
+                  onValueChange={(value) => handleSelectChange('finalidade', value)}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Selecione a finalidade" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EMPREGO">Emprego</SelectItem>
+                    <SelectItem value="VIAGEM">Viagem</SelectItem>
+                    <SelectItem value="OUTRO">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="agencia" className="text-right">
+                  Agência
+                </Label>
+                <Input
+                  id="agencia"
+                  name="agencia"
+                  value={formData.agencia}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="forma_pagamento" className="text-right">
+                  Forma de Pagamento
+                </Label>
+                <Select 
+                  value={formData.forma_pagamento} 
+                  onValueChange={(value) => handleSelectChange('forma_pagamento', value)}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Selecione a forma de pagamento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MBWAY">MBWay</SelectItem>
+                    <SelectItem value="TRANSFERENCIA">Transferência Bancária</SelectItem>
+                    <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="observacoes" className="text-right">
+                  Observações
+                </Label>
+                <Textarea
+                  id="observacoes"
+                  name="observacoes"
+                  value={formData.observacoes}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsRequestModalOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="button" 
+                className="bg-gov-primary hover:bg-gov-secondary"
+                onClick={handleCreateRequest}
+              >
+                Criar Solicitação
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {certificate && (
           <Card className="gov-card animate-fade-in">
@@ -623,22 +680,22 @@ const RecordGenerate = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Nome Completo</h3>
-                      <p className="font-medium">{citizen.name}</p>
+                      <p className="font-medium">{citizen.full_name}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Número de Identificação</h3>
-                      <p className="font-medium">{citizen.id}</p>
+                      <p className="font-medium">{citizen.numero_bi_nuit}</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Data de Nascimento</h3>
-                      <p className="font-medium">{citizen.dob}</p>
+                      <p className="font-medium">{citizen.data_nascimento}</p>
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Nacionalidade</h3>
-                      <p className="font-medium">{citizen.nationality}</p>
+                      <p className="font-medium">{citizen.nacionalidade}</p>
                     </div>
                   </div>
                   
@@ -675,19 +732,19 @@ const RecordGenerate = () => {
                         <div key={index} className="border rounded p-3 bg-gray-50">
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
-                              <span className="font-medium">Processo:</span> {record.case}
+                              <span className="font-medium">Processo:</span> {record.numero_processo}
                             </div>
                             <div>
-                              <span className="font-medium">Data:</span> {record.date}
+                              <span className="font-medium">Data:</span> {record.data_ocorrencia}
                             </div>
                             <div>
-                              <span className="font-medium">Tribunal:</span> {record.court}
+                              <span className="font-medium">Tribunal:</span> {record.tribunal}
                             </div>
                             <div>
-                              <span className="font-medium">Infração:</span> {record.offense}
+                              <span className="font-medium">Infração:</span> {record.tipo_ocorrencia}
                             </div>
                             <div className="col-span-2">
-                              <span className="font-medium">Sentença:</span> {record.sentence}
+                              <span className="font-medium">Sentença:</span> {record.setenca}
                             </div>
                           </div>
                         </div>
@@ -697,7 +754,7 @@ const RecordGenerate = () => {
                   
                   <div className="text-center text-sm text-gray-500 mt-10 pt-6 border-t">
                     <p>Documento emitido eletronicamente em {new Date(certificate.data_emissao).toLocaleDateString()}</p>
-                    <p className="mt-1">Para validar este certificado, visite <span className="text-gov-primary">www.registocriminal.gov.pt</span> e introduza o código de verificação.</p>
+                    <p className="mt-1">Para validar este certificado, visite <span className="text-gov-primary">www.registocriminal.gov.mz</span> e introduza o código de verificação.</p>
                     <div className="mt-3 font-mono bg-gray-100 p-2 rounded">
                       {certificate.numero_referencia}
                     </div>
