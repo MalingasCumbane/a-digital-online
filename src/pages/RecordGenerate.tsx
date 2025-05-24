@@ -8,6 +8,19 @@ import { Separator } from '@/components/ui/separator';
 import { FileText, Printer, Download, Check, X, Loader2 } from 'lucide-react';
 import api from '@/lib/api';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+ } from '@/components/ui/dialog';
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+
+
 
 const RecordGenerate = () => {
   const { id } = useParams();
@@ -16,6 +29,14 @@ const RecordGenerate = () => {
   const [citizen, setCitizen] = useState<any>(null);
   const [certificate, setCertificate] = useState<any>(null);
   const [request, setRequest] = useState<any>(null);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+      finalidade: 'EMPREGO',
+      agencia: '',
+      forma_pagamento: 'MBWAY',
+      observacoes: ''
+    });
+
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -68,12 +89,12 @@ const RecordGenerate = () => {
   const handleCreateRequest = async () => {
     try {
       const response = await api.post('/solicitacoes/', {
-        cidadao: id,
+        cidadao: citizen.id,
         finalidade: 'EMPREGO',
         agencia: 'Agência Central',
         forma_pagamento: 'MBWAY'
       });
-      setRequest(response.data);
+      setRequest("");
       toast({
         title: "Solicitação criada",
         description: "Solicitação de registro criada com sucesso.",
@@ -266,6 +287,22 @@ const RecordGenerate = () => {
     }
   };
 
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleDownload = async () => {
     if (!certificate) return;
     
@@ -416,12 +453,112 @@ const RecordGenerate = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 border-t flex justify-end gap-3">
             {!request ? (
+              <>
               <Button 
-                onClick={handleCreateRequest} 
+                // onClick={handleCreateRequest} 
+                                  onClick={() => setIsRequestModalOpen(true)} 
+
                 className="bg-gov-primary hover:bg-gov-secondary"
               >
                 Criar Solicitação
               </Button>
+              
+              <Dialog open={isRequestModalOpen} onOpenChange={setIsRequestModalOpen}>
+                  <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                      <DialogTitle>Criar Nova Solicitação</DialogTitle>
+                      <DialogDescription>
+                        Preencha os detalhes da solicitação para o cidadão {citizen.full_name}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="finalidade" className="text-right">
+                          Finalidade
+                        </Label>
+                        <Select 
+                          value={formData.finalidade} 
+                          onValueChange={(value) => handleSelectChange('finalidade', value)}
+                        >
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Selecione a finalidade" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="EMPREGO">Emprego</SelectItem>
+                            <SelectItem value="VIAGEM">Viagem</SelectItem>
+                            <SelectItem value="OUTRO">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="agencia" className="text-right">
+                          Agência
+                        </Label>
+                        <Input
+                          id="agencia"
+                          name="agencia"
+                          value={formData.agencia}
+                          onChange={handleInputChange}
+                          className="col-span-3"
+                          required
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="forma_pagamento" className="text-right">
+                          Forma de Pagamento
+                        </Label>
+                        <Select 
+                          value={formData.forma_pagamento} 
+                          onValueChange={(value) => handleSelectChange('forma_pagamento', value)}
+                        >
+                          <SelectTrigger className="col-span-3">
+                            <SelectValue placeholder="Selecione a forma de pagamento" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="MBWAY">MBWay</SelectItem>
+                            <SelectItem value="TRANSFERENCIA">Transferência Bancária</SelectItem>
+                            <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="observacoes" className="text-right">
+                          Observações
+                        </Label>
+                        <Textarea
+                          id="observacoes"
+                          name="observacoes"
+                          value={formData.observacoes}
+                          onChange={handleInputChange}
+                          className="col-span-3"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={() => setIsRequestModalOpen(false)}
+                      >
+                        Cancelar
+                      </Button>
+                      <Button 
+                        type="button" 
+                        className="bg-gov-primary hover:bg-gov-secondary"
+                        onClick={handleCreateRequest}
+                      >
+                        Criar Solicitação
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+              
+              </>
             ) : !certificate ? (
               <Button 
                 onClick={handleGenerateCertificate} 
