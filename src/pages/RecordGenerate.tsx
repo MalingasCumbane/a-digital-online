@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
@@ -7,52 +6,16 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { FileText, Printer, Download, Check, X, Loader2 } from 'lucide-react';
-
-// Mock citizen data including criminal record info
-const mockCitizenData = {
-  '123456789': {
-    id: '123456789',
-    name: 'João Silva',
-    dob: '1985-05-15',
-    address: 'Av. da Liberdade, 123, Lisboa',
-    nationality: 'Portuguesa',
-    hasCriminalRecord: false,
-    recordDetails: null,
-  },
-  '987654321': {
-    id: '987654321',
-    name: 'Maria Santos',
-    dob: '1990-10-25',
-    address: 'Rua Augusta, 45, Lisboa',
-    nationality: 'Portuguesa',
-    hasCriminalRecord: true,
-    recordDetails: [
-      {
-        case: 'PROC-2020-789',
-        court: 'Tribunal Judicial de Lisboa',
-        offense: 'Furto',
-        sentence: 'Multa de 1000€',
-        date: '2021-03-15',
-      },
-    ],
-  },
-  '456789123': {
-    id: '456789123',
-    name: 'António Ferreira',
-    dob: '1978-03-08',
-    address: 'Praça do Comércio, 7, Lisboa',
-    nationality: 'Portuguesa',
-    hasCriminalRecord: false,
-    recordDetails: null,
-  },
-};
+import api from '@/lib/api';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
 const RecordGenerate = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [citizen, setCitizen] = useState<any>(null);
-  const [recordGenerated, setRecordGenerated] = useState(false);
+  const [certificate, setCertificate] = useState<any>(null);
+  const [request, setRequest] = useState<any>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -62,50 +25,276 @@ const RecordGenerate = () => {
       return;
     }
 
-    // Simulate API call to fetch citizen data
-    setLoading(true);
-    setTimeout(() => {
-      const citizenData = mockCitizenData[id as keyof typeof mockCitizenData];
-      if (citizenData) {
-        setCitizen(citizenData);
-      } else {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [citizenRes, registrosRes] = await Promise.all([ api.get(`/pesquisar/cidadaos/${id}/`), api.get(`/cidadaos/${id}/registros/`)]);
+
+        setCitizen({
+          ...citizenRes.data,
+          hasCriminalRecord: registrosRes.data.length > 0,
+          recordDetails: registrosRes.data
+        });
+
+        // Check for existing request
+        try {
+          const requestRes = await api.get(`/solicitacoes/?cidadao=${id}`);
+          if (requestRes.data.length > 0) {
+            setRequest(requestRes.data[0]);
+            
+            // Check for existing certificate
+            if (requestRes.data[0].certificado) {
+              setCertificate(requestRes.data[0].certificado);
+            }
+          }
+        } catch (error) {
+          console.log('No existing request found');
+        }
+      } catch (error) {
         toast({
           variant: "destructive",
           title: "Erro",
           description: "Cidadão não encontrado. Por favor, retorne à pesquisa.",
         });
         navigate('/search');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 1200);
+    };
+
+    fetchData();
   }, [id, navigate, toast]);
 
-  const handleGenerateRecord = () => {
-    setGenerating(true);
-    setTimeout(() => {
-      setGenerating(false);
-      setRecordGenerated(true);
-      toast({
-        title: "Registro gerado com sucesso",
-        description: "O documento PDF está pronto para impressão ou download.",
+  const handleCreateRequest = async () => {
+    try {
+      const response = await api.post('/solicitacoes/', {
+        cidadao: id,
+        finalidade: 'EMPREGO',
+        agencia: 'Agência Central',
+        forma_pagamento: 'MBWAY'
       });
-    }, 2000);
+      setRequest(response.data);
+      toast({
+        title: "Solicitação criada",
+        description: "Solicitação de registro criada com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Falha ao criar solicitação.",
+      });
+    }
   };
 
-  const handlePrint = () => {
-    toast({
-      title: "A imprimir documento",
-      description: "Enviando para a impressora...",
+  const generatePDF = async () => {
+    if (!citizen) return;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([600, 800]);
+    const { width, height } = page.getSize();
+    const fontSize = 12;
+    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    // Header
+    page.drawText('REPÚBLICA PORTUGUESA', {
+      x: 50,
+      y: height - 50,
+      size: 16,
+      font,
+      color: rgb(0, 0, 0.8),
     });
-    // In a real app, this would print the document
+    page.drawText('Ministério da Justiça', {
+      x: 50,
+      y: height - 70,
+      size: 14,
+      font,
+    });
+
+    // Title
+    page.drawText('CERTIFICADO DE REGISTRO CRIMINAL', {
+      x: 50,
+      y: height - 120,
+      size: 18,
+      font,
+      color: rgb(0, 0, 0.8),
+    });
+
+    // Citizen data
+    let y = height - 180;
+    page.drawText(`Nome: ${citizen.name}`, { x: 50, y, size: fontSize, font });
+    y -= 20;
+    page.drawText(`BI/NUIT: ${citizen.id}`, { x: 50, y, size: fontSize, font });
+    y -= 20;
+    page.drawText(`Data Nascimento: ${citizen.dob}`, { x: 50, y, size: fontSize, font });
+    y -= 20;
+    page.drawText(`Endereço: ${citizen.address}`, { x: 50, y, size: fontSize, font });
+    y -= 40;
+
+    // Result
+    if (citizen.hasCriminalRecord) {
+      page.drawText('RESULTADO: POSSUI REGISTROS CRIMINAIS', {
+        x: 50,
+        y,
+        size: 14,
+        font,
+        color: rgb(0.8, 0, 0),
+      });
+      y -= 30;
+
+      // Criminal records
+      page.drawText('Detalhes dos Registros:', { x: 50, y, size: 14, font });
+      y -= 20;
+
+      citizen.recordDetails.forEach((record: any) => {
+        page.drawText(`Processo: ${record.case}`, { x: 60, y, size: fontSize, font });
+        y -= 15;
+        page.drawText(`Tribunal: ${record.court}`, { x: 60, y, size: fontSize, font });
+        y -= 15;
+        page.drawText(`Infração: ${record.offense}`, { x: 60, y, size: fontSize, font });
+        y -= 15;
+        page.drawText(`Sentença: ${record.sentence}`, { x: 60, y, size: fontSize, font });
+        y -= 15;
+        page.drawText(`Data: ${record.date}`, { x: 60, y, size: fontSize, font });
+        y -= 25;
+      });
+    } else {
+      page.drawText('RESULTADO: NÃO POSSUI REGISTROS CRIMINAIS', {
+        x: 50,
+        y,
+        size: 14,
+        font,
+        color: rgb(0, 0.6, 0),
+      });
+      y -= 30;
+    }
+
+    // Footer
+    const today = new Date();
+    const validity = new Date();
+    validity.setDate(validity.getDate() + 90);
+    
+    page.drawText(`Emitido em: ${today.toLocaleDateString()}`, {
+      x: 50,
+      y: 100,
+      size: fontSize,
+      font,
+    });
+    page.drawText(`Válido até: ${validity.toLocaleDateString()}`, {
+      x: 50,
+      y: 80,
+      size: fontSize,
+      font,
+    });
+
+    // Signature
+    page.drawText('_________________________', {
+      x: width - 200,
+      y: 60,
+      size: fontSize,
+      font,
+    });
+    page.drawText('Funcionário Responsável', {
+      x: width - 200,
+      y: 40,
+      size: fontSize,
+      font,
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    return new Blob([pdfBytes], { type: 'application/pdf' });
   };
 
-  const handleDownload = () => {
-    toast({
-      title: "Download iniciado",
-      description: "O seu documento PDF está a ser baixado.",
-    });
-    // In a real app, this would download the PDF file
+  const handleGenerateCertificate = async () => {
+    if (!request) return;
+    
+    setGenerating(true);
+    try {
+      // Generate PDF
+      const pdfBlob = await generatePDF();
+      
+      // Create form data to send PDF to server
+      const formData = new FormData();
+      formData.append('pdf', pdfBlob, `certificado-${id}.pdf`);
+      
+      // Send to backend
+      const response = await api.post(`/certificados/${request.id}/gerar/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      setCertificate(response.data);
+      toast({
+        title: "Certificado gerado",
+        description: "O certificado foi gerado com sucesso.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Falha ao gerar certificado.",
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handlePrint = async () => {
+    if (!certificate) return;
+    
+    try {
+      const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
+        responseType: 'blob'
+      });
+      
+      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const printWindow = window.open(pdfUrl);
+      
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Falha ao imprimir documento.",
+      });
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!certificate) return;
+    
+    try {
+      const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
+        responseType: 'blob'
+      });
+      
+      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      const a = document.createElement('a');
+      a.href = pdfUrl;
+      a.download = `certificado-${citizen.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Download iniciado",
+        description: "O certificado está sendo baixado.",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Erro",
+        description: "Falha ao baixar documento.",
+      });
+    }
   };
 
   if (loading) {
@@ -116,6 +305,16 @@ const RecordGenerate = () => {
             <Loader2 className="h-10 w-10 animate-spin mx-auto text-gov-primary mb-4" />
             <p className="text-lg text-gray-500">Carregando dados do cidadão...</p>
           </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!citizen) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-[60vh]">
+          <p className="text-lg text-gray-500">Cidadão não encontrado</p>
         </div>
       </DashboardLayout>
     );
@@ -139,42 +338,42 @@ const RecordGenerate = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Nome Completo</h3>
-                  <p className="text-lg">{citizen.name}</p>
+                  <p className="text-lg">{citizen.full_name}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Número de Identificação</h3>
-                  <p className="text-lg">{citizen.id}</p>
+                  <p className="text-lg">{citizen.numero_bi_nuit}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Data de Nascimento</h3>
-                  <p className="text-lg">{citizen.dob}</p>
+                  <p className="text-lg">{citizen.data_nascimento}</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Nacionalidade</h3>
-                  <p className="text-lg">{citizen.nationality}</p>
+                  <p className="text-lg">{citizen.nacionalidade}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Endereço</h3>
-                  <p className="text-lg">{citizen.address}</p>
+                  <p className="text-lg">{citizen.endereco}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Estado do Registro</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {citizen.hasCriminalRecord ? (
                       <>
-                        <div className="bg-red-100 p-1 rounded-full">
-                          <X className="h-4 w-4 text-red-600" />
-                        </div>
-                        <span className="text-red-600 font-medium">Com Registros Criminais</span>
-                      </>
-                    ) : (
-                      <>
                         <div className="bg-green-100 p-1 rounded-full">
                           <Check className="h-4 w-4 text-green-600" />
                         </div>
-                        <span className="text-green-600 font-medium">Sem Registros Criminais</span>
+                          <span className="text-green-600 font-medium">Com Registros Criminais</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-red-100 p-1 rounded-full">
+                          <X className="h-4 w-4 text-red-600" />
+                        </div>
+                        <span className="text-red-600 font-medium">Sem Registros Criminais</span>
                       </>
                     )}
                   </div>
@@ -201,11 +400,11 @@ const RecordGenerate = () => {
                       <tbody>
                         {citizen.recordDetails.map((record: any, index: number) => (
                           <tr key={index} className="border-b last:border-b-0 hover:bg-gray-50">
-                            <td className="py-3">{record.case}</td>
-                            <td className="py-3">{record.court}</td>
-                            <td className="py-3">{record.offense}</td>
-                            <td className="py-3">{record.sentence}</td>
-                            <td className="py-3">{record.date}</td>
+                            <td className="py-3">{record.numero_processo}</td>
+                            <td className="py-3">{record.tribunal}</td>
+                            <td className="py-3">{record.tipo_ocorrencia}</td>
+                            <td className="py-3">{record.setenca}</td>
+                            <td className="py-3">{record.data_ocorrencia}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -216,9 +415,16 @@ const RecordGenerate = () => {
             )}
           </CardContent>
           <CardFooter className="bg-gray-50 border-t flex justify-end gap-3">
-            {!recordGenerated ? (
+            {!request ? (
               <Button 
-                onClick={handleGenerateRecord} 
+                onClick={handleCreateRequest} 
+                className="bg-gov-primary hover:bg-gov-secondary"
+              >
+                Criar Solicitação
+              </Button>
+            ) : !certificate ? (
+              <Button 
+                onClick={handleGenerateCertificate} 
                 className="bg-gov-primary hover:bg-gov-secondary"
                 disabled={generating}
               >
@@ -255,7 +461,7 @@ const RecordGenerate = () => {
           </CardFooter>
         </Card>
 
-        {recordGenerated && (
+        {certificate && (
           <Card className="gov-card animate-fade-in">
             <CardHeader>
               <CardTitle>Documento Gerado com Sucesso</CardTitle>
@@ -265,7 +471,7 @@ const RecordGenerate = () => {
               <div className="border rounded-md p-8 bg-white shadow-sm">
                 <div className="flex justify-center mb-6">
                   <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-gov-primary">REPÚBLICA PORTUGUESA</h2>
+                    <h2 className="text-2xl font-semibold text-gov-primary">REPÚBLICA DE MOÇAMBIQUE</h2>
                     <h3 className="text-lg">Ministério da Justiça</h3>
                     <p className="text-sm text-gray-500 mt-1">Direção-Geral da Administração da Justiça</p>
                   </div>
@@ -273,7 +479,7 @@ const RecordGenerate = () => {
                 
                 <div className="text-center mb-8">
                   <h1 className="text-xl font-bold uppercase">Certificado de Registro Criminal</h1>
-                  <p className="text-sm text-gray-500">Documento Oficial - Nº {Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}/2023</p>
+                  <p className="text-sm text-gray-500">Documento Oficial - Nº {certificate.numero_referencia}</p>
                 </div>
                 
                 <div className="space-y-6 mb-8">
@@ -353,11 +559,10 @@ const RecordGenerate = () => {
                   )}
                   
                   <div className="text-center text-sm text-gray-500 mt-10 pt-6 border-t">
-                    <p>Documento emitido eletronicamente em {new Date().toLocaleDateString()} às {new Date().toLocaleTimeString()}</p>
+                    <p>Documento emitido eletronicamente em {new Date(certificate.data_emissao).toLocaleDateString()}</p>
                     <p className="mt-1">Para validar este certificado, visite <span className="text-gov-primary">www.registocriminal.gov.pt</span> e introduza o código de verificação.</p>
                     <div className="mt-3 font-mono bg-gray-100 p-2 rounded">
-                      {Array.from({length: 6}, () => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase()}-
-                      {Array.from({length: 6}, () => Math.floor(Math.random() * 16).toString(16)).join('').toUpperCase()}
+                      {certificate.numero_referencia}
                     </div>
                   </div>
                 </div>

@@ -41,7 +41,7 @@ const Header = () => {
               <div className="text-white font-bold text-sm">SRC</div>
             </div>
             <h1 className="text-lg font-semibold hidden sm:block">
-              Sistema de Registro Criminal
+              {/* Sistema de Registro Criminal */}
             </h1>
           </div>
         </div>
