@@ -23,12 +23,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full bg-gray-50">
+      <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
-          <main className="flex-1 overflow-auto transition-all duration-300 ml-[70px] md:ml-64 bg-gray-50 relative z-10">
-            <div className="container mx-auto py-8 px-6">
+          <main className="flex-1 overflow-auto transition-all duration-300 ml-[70px] md:ml-64">
+            <div className="container mx-auto py-6 px-4">
               {children}
             </div>
             <Footer />

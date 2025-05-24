@@ -9,7 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Search from "./pages/Search";
 import Records from "./pages/Records";
 import RecordGenerate from "./pages/RecordGenerate";
-import InfoPage from "./pages/Info";
+import Info from "./pages/Info";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +26,7 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/records" element={<Records />} />
           <Route path="/records/generate/:id" element={<RecordGenerate />} />
-          <Route path="/info" element={<InfoPage />} />
+          <Route path="/info" element={<Info />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
