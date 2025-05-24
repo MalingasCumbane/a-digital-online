@@ -28,10 +28,7 @@ const RecordGenerate = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [citizenRes, registrosRes] = await Promise.all([
-          api.get(`/cidadaos/${id}/`),
-          api.get(`/cidadaos/${id}/registros/`)
-        ]);
+        const [citizenRes, registrosRes] = await Promise.all([ api.get(`/pesquisar/cidadaos/${id}/`), api.get(`/cidadaos/${id}/registros/`)]);
 
         setCitizen({
           ...citizenRes.data,
@@ -341,42 +338,42 @@ const RecordGenerate = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Nome Completo</h3>
-                  <p className="text-lg">{citizen.name}</p>
+                  <p className="text-lg">{citizen.full_name}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Número de Identificação</h3>
-                  <p className="text-lg">{citizen.id}</p>
+                  <p className="text-lg">{citizen.numero_bi_nuit}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Data de Nascimento</h3>
-                  <p className="text-lg">{citizen.dob}</p>
+                  <p className="text-lg">{citizen.data_nascimento}</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Nacionalidade</h3>
-                  <p className="text-lg">{citizen.nationality}</p>
+                  <p className="text-lg">{citizen.nacionalidade}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Endereço</h3>
-                  <p className="text-lg">{citizen.address}</p>
+                  <p className="text-lg">{citizen.endereco}</p>
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Estado do Registro</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {citizen.hasCriminalRecord ? (
                       <>
-                        <div className="bg-red-100 p-1 rounded-full">
-                          <X className="h-4 w-4 text-red-600" />
-                        </div>
-                        <span className="text-red-600 font-medium">Com Registros Criminais</span>
-                      </>
-                    ) : (
-                      <>
                         <div className="bg-green-100 p-1 rounded-full">
                           <Check className="h-4 w-4 text-green-600" />
                         </div>
-                        <span className="text-green-600 font-medium">Sem Registros Criminais</span>
+                          <span className="text-green-600 font-medium">Com Registros Criminais</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-red-100 p-1 rounded-full">
+                          <X className="h-4 w-4 text-red-600" />
+                        </div>
+                        <span className="text-red-600 font-medium">Sem Registros Criminais</span>
                       </>
                     )}
                   </div>
@@ -403,11 +400,11 @@ const RecordGenerate = () => {
                       <tbody>
                         {citizen.recordDetails.map((record: any, index: number) => (
                           <tr key={index} className="border-b last:border-b-0 hover:bg-gray-50">
-                            <td className="py-3">{record.case}</td>
-                            <td className="py-3">{record.court}</td>
-                            <td className="py-3">{record.offense}</td>
-                            <td className="py-3">{record.sentence}</td>
-                            <td className="py-3">{record.date}</td>
+                            <td className="py-3">{record.numero_processo}</td>
+                            <td className="py-3">{record.tribunal}</td>
+                            <td className="py-3">{record.tipo_ocorrencia}</td>
+                            <td className="py-3">{record.setenca}</td>
+                            <td className="py-3">{record.data_ocorrencia}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -474,7 +471,7 @@ const RecordGenerate = () => {
               <div className="border rounded-md p-8 bg-white shadow-sm">
                 <div className="flex justify-center mb-6">
                   <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-gov-primary">REPÚBLICA PORTUGUESA</h2>
+                    <h2 className="text-2xl font-semibold text-gov-primary">REPÚBLICA DE MOÇAMBIQUE</h2>
                     <h3 className="text-lg">Ministério da Justiça</h3>
                     <p className="text-sm text-gray-500 mt-1">Direção-Geral da Administração da Justiça</p>
                   </div>

@@ -25,6 +25,11 @@ const Login = () => {
       }
 
       console.log("data: ", data)
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+
       const response = await api.post('/login/', data);
 
       // Armazena o token e os dados do usuário

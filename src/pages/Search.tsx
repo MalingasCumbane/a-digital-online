@@ -42,12 +42,8 @@ const Search = () => {
     setHasSearched(true);
 
     try {
-      const response = await api.get('/cidadaos/search/', {
-        params: {
-          q: searchQuery,
-          type: searchType === 'id' ? 'bi' : 'nome'
-        }
-      });
+      
+      const response = await api.get('/cidadaos/search/', { params: {  q: searchQuery, type: searchType === 'id' ? 'bi' : 'nome' }});
 
       setSearchResults(response.data.results.map(c => ({
         id: c.numero_bi_nuit,
