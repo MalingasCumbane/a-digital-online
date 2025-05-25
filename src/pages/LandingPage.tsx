@@ -17,6 +17,8 @@ const LandingPage = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+
+
     if (!recordNumber.trim()) {
       toast({
         variant: "destructive",
@@ -25,10 +27,9 @@ const LandingPage = () => {
       });
       return;
     }
-
     setIsSearching(true);
     try {
-      const response = await api.get(`/records/${recordNumber}`);
+      const response = await api.get(`/records/certificate/${recordNumber}/`);
       setSearchResult(response.data);
       toast({
         title: "Registo encontrado",
@@ -154,7 +155,7 @@ const LandingPage = () => {
                       Nome Completo
                     </label>
                     <p className="text-gray-900">
-                      {searchResult.citizen_name || 'N/A'}
+                      {searchResult.cidadao.full_name || 'N/A'}
                     </p>
                   </div>
                   <div>
@@ -162,7 +163,13 @@ const LandingPage = () => {
                       Estado
                     </label>
                     <p className="text-gray-900">
-                      {searchResult.status || 'N/A'}
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        searchResult.cumprido 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {searchResult.cumprido ? 'Cumprido' : 'Não cumprido'}
+                      </span>
                     </p>
                   </div>
                   <div>
@@ -170,7 +177,7 @@ const LandingPage = () => {
                       Data de Emissão
                     </label>
                     <p className="text-gray-900">
-                      {searchResult.issued_date || 'N/A'}
+                      {searchResult.data_ocorrencia || 'N/A'}
                     </p>
                   </div>
                 </div>
