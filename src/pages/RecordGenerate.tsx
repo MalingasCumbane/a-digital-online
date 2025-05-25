@@ -334,37 +334,81 @@ const RecordGenerate = () => {
     }));
   };
 
-  const handleDownload = async () => {
-    if (!certificate) return;
-    
-    try {
-      const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
-        responseType: 'blob'
-      });
+      const handleDownload = async () => {
+      if (!certificate || !citizen) return;
       
-      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-      const pdfUrl = URL.createObjectURL(pdfBlob);
+      try {
+        setGenerating(true);
+        
+        // Gera o PDF localmente
+        const pdfBlob = await generatePDF();
+        
+        // Cria a URL do objeto
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+        // Cria um link temporário
+        const a = document.createElement('a');
+        a.href = pdfUrl;
+        a.download = `certificado-${citizen.numero_bi_nuit}.pdf`;
+        a.style.display = 'none';
+        
+        // Adiciona ao DOM e clica
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpeza
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(pdfUrl);
+        }, 100);
+
+        toast({
+          title: "Download iniciado",
+          description: "O certificado foi baixado com sucesso.",
+        });
+      } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        toast({
+          variant: "destructive",
+          title: "Erro",
+          description: "Falha ao gerar o documento PDF.",
+        });
+      } finally {
+        setGenerating(false);
+      }
+    };
+
+    // const handleDownload = async () => {
+    //   if (!certificate) return;
       
-      const a = document.createElement('a');
-      a.href = pdfUrl;
-      a.download = `certificado-${citizen.numero_bi_nuit}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(pdfUrl);
-      
-      toast({
-        title: "Download iniciado",
-        description: "O certificado está sendo baixado.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro",
-        description: error.response?.data?.message || "Falha ao baixar documento.",
-      });
-    }
-  };
+    //   try {
+    //     const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
+    //       responseType: 'blob'
+    //     });
+        
+    //     const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+    //     const pdfUrl = URL.createObjectURL(pdfBlob);
+        
+    //     const a = document.createElement('a');
+    //     a.href = pdfUrl;
+    //     a.download = `certificado-${citizen.numero_bi_nuit}.pdf`;
+    //     document.body.appendChild(a);
+    //     a.click();
+    //     document.body.removeChild(a);
+    //     window.URL.revokeObjectURL(pdfUrl);
+        
+    //     toast({
+    //       title: "Download iniciado",
+    //       description: "O certificado está sendo baixado.",
+    //     });
+    //   } catch (error) {
+    //     toast({
+    //       variant: "destructive",
+    //       title: "Erro",
+    //       description: error.response?.data?.message || "Falha ao baixar documento.",
+    //     });
+    //   }
+    // };
 
   // const handleRefreshCertificate = async () => {
   //   if (!certificate) return;
@@ -391,7 +435,6 @@ const RecordGenerate = () => {
     try {
       setGenerating(true);
       
-      // Apenas busca os dados atualizados do certificado existente
       const response = await api.get(`/certificados/actualizar/${certificate.id}/`);
       setCertificate(response.data);
       
@@ -557,13 +600,26 @@ const RecordGenerate = () => {
                   </Button>
                 ) : (
                   <>
+               
                     <Button 
                       variant="outline"
                       onClick={handleDownload}
+                      disabled={generating}
                     >
-                      <Download className="mr-2 h-4 w-4" />
-                      Baixar PDF
+                      {generating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Gerando PDF...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Baixar PDF
+                        </>
+                      )}
                     </Button>
+
+
                     <Button 
                       onClick={handlePrint}
                       className="bg-gov-primary hover:bg-gov-secondary"
