@@ -378,57 +378,6 @@ const RecordGenerate = () => {
       }
     };
 
-    // const handleDownload = async () => {
-    //   if (!certificate) return;
-      
-    //   try {
-    //     const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
-    //       responseType: 'blob'
-    //     });
-        
-    //     const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-    //     const pdfUrl = URL.createObjectURL(pdfBlob);
-        
-    //     const a = document.createElement('a');
-    //     a.href = pdfUrl;
-    //     a.download = `certificado-${citizen.numero_bi_nuit}.pdf`;
-    //     document.body.appendChild(a);
-    //     a.click();
-    //     document.body.removeChild(a);
-    //     window.URL.revokeObjectURL(pdfUrl);
-        
-    //     toast({
-    //       title: "Download iniciado",
-    //       description: "O certificado está sendo baixado.",
-    //     });
-    //   } catch (error) {
-    //     toast({
-    //       variant: "destructive",
-    //       title: "Erro",
-    //       description: error.response?.data?.message || "Falha ao baixar documento.",
-    //     });
-    //   }
-    // };
-
-  // const handleRefreshCertificate = async () => {
-  //   if (!certificate) return;
-    
-  //   try {
-  //     const response = await api.get(`/certificados/${certificate.id}/`);
-  //     setCertificate(response.data);
-  //     toast({
-  //       title: "Certificado atualizado",
-  //       description: "Os dados do certificado foram atualizados.",
-  //     });
-  //   } catch (error) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Erro",
-  //       description: error.response?.data?.message || "Falha ao recarregar certificado.",
-  //     });
-  //   }
-  // };
-
     const handleRefreshCertificate = async () => {
     if (!certificate) return;
     
@@ -627,13 +576,7 @@ const RecordGenerate = () => {
                       <Printer className="mr-2 h-4 w-4" />
                       Imprimir Documento
                     </Button>
-                    {/* <Button 
-                      variant="outline"
-                      onClick={handleRefreshCertificate}
-                    >
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Actualizar
-                    </Button> */}
+                    
                     <Button 
                       variant="outline"
                       onClick={handleRefreshCertificate}
