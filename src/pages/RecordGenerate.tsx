@@ -366,22 +366,47 @@ const RecordGenerate = () => {
     }
   };
 
-  const handleRefreshCertificate = async () => {
+  // const handleRefreshCertificate = async () => {
+  //   if (!certificate) return;
+    
+  //   try {
+  //     const response = await api.get(`/certificados/${certificate.id}/`);
+  //     setCertificate(response.data);
+  //     toast({
+  //       title: "Certificado atualizado",
+  //       description: "Os dados do certificado foram atualizados.",
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Erro",
+  //       description: error.response?.data?.message || "Falha ao recarregar certificado.",
+  //     });
+  //   }
+  // };
+
+    const handleRefreshCertificate = async () => {
     if (!certificate) return;
     
     try {
-      const response = await api.get(`/certificados/${certificate.id}/`);
+      setGenerating(true);
+      
+      // Apenas busca os dados atualizados do certificado existente
+      const response = await api.get(`/certificados/actualizar/${certificate.id}/`);
       setCertificate(response.data);
+      
       toast({
         title: "Certificado atualizado",
         description: "Os dados do certificado foram atualizados.",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: error.response?.data?.message || "Falha ao recarregar certificado.",
+        description: error.response?.data?.message || "Falha ao atualizar certificado.",
       });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -546,12 +571,29 @@ const RecordGenerate = () => {
                       <Printer className="mr-2 h-4 w-4" />
                       Imprimir Documento
                     </Button>
-                    <Button 
+                    {/* <Button 
                       variant="outline"
                       onClick={handleRefreshCertificate}
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
-                      Atualizar
+                      Actualizar
+                    </Button> */}
+                    <Button 
+                      variant="outline"
+                      onClick={handleRefreshCertificate}
+                      disabled={generating}
+                    >
+                      {generating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          A carregar...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Actualizar Dados
+                        </>
+                      )}
                     </Button>
                   </>
                 )}
