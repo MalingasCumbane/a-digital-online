@@ -97,6 +97,8 @@ const RecordGenerate = () => {
     fetchData();
   }, [id, navigate, toast]);
 
+  
+
   const handleCreateRequest = async () => {
     try {
       const response = await api.post('/solicitacoes/', {
@@ -293,29 +295,67 @@ const RecordGenerate = () => {
     }
   };
 
-  const handlePrint = async () => {
-    if (!certificate) return;
+  // const handlePrint = async () => {
+  //   if (!certificate) return;
+    
+  //   try {
+  //     const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
+  //       responseType: 'blob'
+  //     });
+      
+  //     const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+  //     const pdfUrl = URL.createObjectURL(pdfBlob);
+  //     const printWindow = window.open(pdfUrl);
+      
+  //     if (printWindow) {
+  //       printWindow.onload = () => {
+  //         printWindow.print();
+  //       };
+  //     }
+  //   } catch (error) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Erro",
+  //       description: error.response?.data?.message || "Falha ao imprimir documento.",
+  //     });
+  //   }
+  // };
+
+    const handlePrint = async () => {
+    if (!citizen) return;
     
     try {
-      const response = await api.get(`/certificados/${certificate.id}/pdf/`, {
-        responseType: 'blob'
-      });
+      setGenerating(true);
       
-      const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+      // Gera o PDF localmente
+      const pdfBlob = await generatePDF();
       const pdfUrl = URL.createObjectURL(pdfBlob);
+      
+      // Abre uma nova janela para impressão
       const printWindow = window.open(pdfUrl);
       
       if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-        };
+        // Usamos setTimeout para garantir que o PDF esteja carregado
+        setTimeout(() => {
+          printWindow.focus(); // Foca na janela
+          printWindow.print(); // Chama a função de impressão
+        }, 500);
       }
+      
+      // Limpeza após impressão (ou se o usuário cancelar)
+      setTimeout(() => {
+        URL.revokeObjectURL(pdfUrl);
+      }, 10000); // Limpa após 10 segundos
+      
     } catch (error) {
+      console.error('Erro ao gerar PDF para impressão:', error);
       toast({
         variant: "destructive",
         title: "Erro",
-        description: error.response?.data?.message || "Falha ao imprimir documento.",
+        description: "Falha ao preparar o documento para impressão.",
       });
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -572,9 +612,19 @@ const RecordGenerate = () => {
                     <Button 
                       onClick={handlePrint}
                       className="bg-gov-primary hover:bg-gov-secondary"
+                      disabled={generating}
                     >
-                      <Printer className="mr-2 h-4 w-4" />
-                      Imprimir Documento
+                      {generating ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Preparando impressão...
+                        </>
+                      ) : (
+                        <>
+                          <Printer className="mr-2 h-4 w-4" />
+                          Imprimir Documento
+                        </>
+                      )}
                     </Button>
                     
                     <Button 
