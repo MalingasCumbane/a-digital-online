@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,39 +5,56 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Lock } from 'lucide-react';
+import api from '@/lib/api';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // Mudamos de username para email
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate authentication - in a real app this would call your auth API
-    setTimeout(() => {
-      // For demo purposes, any login works
-      if (username && password) {
-        // Store some user info in local storage
-        localStorage.setItem('user', JSON.stringify({ name: username, role: 'Oficial de Registos' }));
-        localStorage.setItem('isAuthenticated', 'true');
-        navigate('/dashboard');
-        toast({
-          title: "Autenticação bem-sucedida",
-          description: "Bem-vindo ao Sistema de Registro Criminal.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro de autenticação",
-          description: "Por favor, insira as credenciais válidas.",
-        });
+    try {
+      const data = {
+        user_name: email,
+        password: password
       }
+
+      console.log("data: ", data)
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('isAuthenticated');
+
+      const response = await api.post('/login/', data);
+
+      // Armazena o token e os dados do usuário
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('isAuthenticated', 'true');
+
+      // Navega para o dashboard
+      navigate('/dashboard');
+      
+      toast({
+        title: "Autenticação bem-sucedida",
+        description: "Bem-vindo ao Sistema de Registo Criminal.",
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      
+      toast({
+        variant: "destructive",
+        title: "Erro de autenticação",
+        description: "Credenciais inválidas ou erro no servidor.",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -51,7 +67,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gov-foreground">
-            Sistema de Registro Criminal
+            Sistema de Registo Criminal
           </h1>
           <p className="text-gray-500 mt-2">Ministério da Justiça</p>
         </div>
@@ -60,22 +76,22 @@ const Login = () => {
           <CardHeader>
             <CardTitle>Autenticação de Oficial</CardTitle>
             <CardDescription>
-              Insira as suas credenciais para acessar o sistema de registros criminais.
+              Insira as suas credenciais para acessar o sistema de registos criminais.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium text-gray-700">
-                  Nome de utilizador
+                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email
                 </label>
                 <Input
-                  id="username"
+                  id="email"
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="gov-input"
-                  placeholder="Insira o seu nome de utilizador"
+                  placeholder="Insira o seu email"
                   required
                 />
               </div>
@@ -106,7 +122,7 @@ const Login = () => {
           </form>
         </Card>
         <p className="text-center mt-6 text-sm text-gray-500">
-          © {new Date().getFullYear()} Sistema de Registro Criminal - Todos os direitos reservados
+          © {new Date().getFullYear()} Sistema de Registo Criminal - Todos os direitos reservados
         </p>
       </div>
     </div>
