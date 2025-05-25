@@ -1,3 +1,4 @@
+
 import axios from 'axios';
 
 // Base API configuration
@@ -28,7 +29,7 @@ export default api;
 export const CriminalRecordsService = {
   getAllRecords: async (searchTerm = '') => {
     try {
-      const params = {};
+      const params: { search?: string } = {};
       if (searchTerm) {
         params.search = searchTerm;
       }
