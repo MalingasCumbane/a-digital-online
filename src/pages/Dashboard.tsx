@@ -1,52 +1,43 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { FileText, User, Search, Check } from 'lucide-react';
+import axios from 'axios';
+import api from '@/lib/api';
+// import { useAuth } from '@/context/AuthContext';
 
-// Mock data
-const stats = [
-  {
-    title: 'Registos Emitidos',
-    value: 346,
-    icon: FileText,
-    color: 'bg-blue-100 text-blue-600',
-    change: '+12%',
-  },
-  {
-    title: 'Pesquisas Realizadas',
-    value: 584,
-    icon: Search,
-    color: 'bg-green-100 text-green-600',
-    change: '+18%',
-  },
-  {
-    title: 'Cidadãos Processados',
-    value: 429,
-    icon: User,
-    color: 'bg-amber-100 text-amber-600',
-    change: '+7%',
-  },
-  {
-    title: 'Registos Limpos',
-    value: 268,
-    icon: Check,
-    color: 'bg-indigo-100 text-indigo-600',
-    change: '+4%',
-  },
-];
+// Tipos para os dados
+type StatCard = {
+  title: string;
+  value: number;
+  icon: any;
+  color: string;
+  change: string;
+};
 
-const recentRecords = [
-  { id: 'CR-5932', name: 'Ana Silva', date: '2023-05-10', status: 'Emitido' },
-  { id: 'CR-5931', name: 'João Santos', date: '2023-05-10', status: 'Pendente' },
-  { id: 'CR-5930', name: 'Maria Oliveira', date: '2023-05-09', status: 'Emitido' },
-  { id: 'CR-5929', name: 'António Costa', date: '2023-05-09', status: 'Emitido' },
-  { id: 'CR-5928', name: 'Carla Mendes', date: '2023-05-08', status: 'Emitido' },
-];
+type RecentRecord = {
+  id: string;
+  name: string;
+  date: string;
+  status: string;
+};
 
 const Dashboard = () => {
   const [greeting, setGreeting] = useState('');
   const [username, setUsername] = useState('');
+  const [stats, setStats] = useState<StatCard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  // const { token } = useAuth();
+
+  // Mock data para registros recentes (pode ser substituído por dados reais depois)
+  const recentRecords: RecentRecord[] = [
+    { id: 'CR-5932', name: 'Ana Silva', date: '2023-05-10', status: 'Emitido' },
+    { id: 'CR-5931', name: 'João Santos', date: '2023-05-10', status: 'Pendente' },
+    { id: 'CR-5930', name: 'Maria Oliveira', date: '2023-05-09', status: 'Emitido' },
+    { id: 'CR-5929', name: 'António Costa', date: '2023-05-09', status: 'Emitido' },
+    { id: 'CR-5928', name: 'Carla Mendes', date: '2023-05-08', status: 'Emitido' },
+  ];
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -63,7 +54,101 @@ const Dashboard = () => {
       const userData = JSON.parse(storedUser);
       setUsername(userData.name);
     }
+
+    // Buscar estatísticas da API
+    const fetchStats = async () => {
+      try {
+        const response = await api.get('/dashboard-stats/', {
+          // headers: {
+          //   Authorization: `Bearer ${token}`,
+          // },
+        });
+        
+        const data = response.data;
+        
+        setStats([
+          {
+            title: 'Registos Emitidos',
+            value: data.registos_emitidos,
+            icon: FileText,
+            color: 'bg-blue-100 text-blue-600',
+            change: '+12%',
+          },
+          {
+            title: 'Pesquisas Realizadas',
+            value: data.pesquisas_realizadas,
+            icon: Search,
+            color: 'bg-green-100 text-green-600',
+            change: '+18%',
+          },
+          {
+            title: 'Registos Processados',
+            value: data.cidadaos_processados,
+            icon: User,
+            color: 'bg-amber-100 text-amber-600',
+            change: '+7%',
+          },
+          {
+            title: 'Registos Limpos',
+            value: data.registos_limpos,
+            icon: Check,
+            color: 'bg-indigo-100 text-indigo-600',
+            change: '+4%',
+          },
+        ]);
+        
+        setLoading(false);
+      } catch (err) {
+        setError('Erro ao carregar estatísticas');
+        setLoading(false);
+        console.error(err);
+        
+        // Fallback para dados mockados em caso de erro
+        setStats([
+          {
+            title: 'Registos Emitidos',
+            value: 346,
+            icon: FileText,
+            color: 'bg-blue-100 text-blue-600',
+            change: '+12%',
+          },
+          {
+            title: 'Pesquisas Realizadas',
+            value: 584,
+            icon: Search,
+            color: 'bg-green-100 text-green-600',
+            change: '+18%',
+          },
+          {
+            title: 'Cidadãos Processados',
+            value: 429,
+            icon: User,
+            color: 'bg-amber-100 text-amber-600',
+            change: '+7%',
+          },
+          {
+            title: 'Registos Limpos',
+            value: 268,
+            icon: Check,
+            color: 'bg-indigo-100 text-indigo-600',
+            change: '+4%',
+          },
+        ]);
+      }
+    };
+
+    fetchStats();
   }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -72,6 +157,21 @@ const Dashboard = () => {
         <p className="text-gray-500 mb-6">
           {greeting}, {username}! Bem-vindo ao Sistema de Registo Criminal.
         </p>
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (
