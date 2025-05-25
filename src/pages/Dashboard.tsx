@@ -259,7 +259,7 @@ const Dashboard = () => {
                   <div>
                     <h4 className="font-medium">Pesquisar Cidadão</h4>
                     <p className="text-sm text-gray-500">
-                      Procure por número de ID ou nome
+                      Procure por número de B.I ou nome
                     </p>
                   </div>
                 </div>

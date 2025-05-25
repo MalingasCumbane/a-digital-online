@@ -98,7 +98,7 @@ const Search = () => {
                     value={searchType}
                     onChange={(e) => setSearchType(e.target.value as 'id' | 'name')}
                   >
-                    <option value="id">Número de ID</option>
+                    <option value="id">Número de B.I</option>
                     <option value="name">Nome Completo</option>
                   </select>
                 </div>

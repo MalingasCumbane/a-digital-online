@@ -89,7 +89,7 @@ const InfoPage = () => {
                   </div>
                   <h3 className="font-semibold mb-2 text-lg">1. Pesquisa</h3>
                   <p className="text-sm text-gray-600">
-                    Pesquise o cidadão pelo número de ID ou nome completo
+                    Pesquise o cidadão pelo número de B.I ou nome completo
                   </p>
                 </div>
                 

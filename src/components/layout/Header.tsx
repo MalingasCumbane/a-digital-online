@@ -7,7 +7,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { useSidebar } from '@/hooks/use-sidebar';
 
 const Header = () => {
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; full_name: string } | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { toggleSidebar } = useSidebar();
@@ -50,8 +50,8 @@ const Header = () => {
           {user && (
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-gray-500">{user.role}</p>
+                <p className="text-sm font-medium">{user.full_name}</p>
+                <p className="text-xs text-gray-500">Oficial de Registos</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="p-1 bg-gov-primary/10 rounded-full">

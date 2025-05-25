@@ -12,6 +12,10 @@ const navItems = [
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 
+const today = new Date();
+const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
+
+
 const Sidebar = () => {
   const { isOpen, toggleSidebar } = useSidebar();
 
@@ -83,7 +87,7 @@ const Sidebar = () => {
           )}
         >
           <Settings className="h-4 w-4" />
-          {isOpen && <span>Configurações</span>}
+          {isOpen && <span>GRUPO 3 - {formattedDate}. </span>}
         </Button>
       </div>
     </aside>
