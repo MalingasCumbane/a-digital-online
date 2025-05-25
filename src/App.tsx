@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Search from "./pages/Search";
 import Records from "./pages/Records";
 import RecordGenerate from "./pages/RecordGenerate";
+import RecordDetail from "./pages/RecordDetail";
 import InfoPage from "./pages/Info";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/records" element={<Records />} />
           <Route path="/records/generate/:id" element={<RecordGenerate />} />
+          <Route path="/record/:recordNumber" element={<RecordDetail />} />
           <Route path="/info" element={<InfoPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
