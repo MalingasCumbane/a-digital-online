@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search as SearchIcon, User, Loader2, FileText } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import api from '@/lib/api';
 
 // Mock citizen data
 const mockCitizens = [
-  { id: '123456789', name: 'João Silva', dob: '1985-05-15', address: 'Av. da Liberdade, 123, Maputo' },
-  { id: '987654321', name: 'Maria Santos', dob: '1990-10-25', address: 'Rua Augusta, 45, Maputo' },
-  { id: '456789123', name: 'António Ferreira', dob: '1978-03-08', address: 'Praça do Comércio, 7, Maputo' },
+  { id: '123456789', name: 'João Silva', dob: '1985-05-15', address: 'Av. da Liberdade, 123, Lisboa' },
+  { id: '987654321', name: 'Maria Santos', dob: '1990-10-25', address: 'Rua Augusta, 45, Lisboa' },
+  { id: '456789123', name: 'António Ferreira', dob: '1978-03-08', address: 'Praça do Comércio, 7, Lisboa' },
 ];
 
 const Search = () => {
@@ -25,8 +24,7 @@ const Search = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-
-    const handleSearch = async (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!searchQuery.trim()) {
@@ -41,32 +39,26 @@ const Search = () => {
     setIsSearching(true);
     setHasSearched(true);
 
-    try {
+    // Simulate API call
+    setTimeout(() => {
+      const results = mockCitizens.filter(citizen => {
+        if (searchType === 'id') {
+          return citizen.id.includes(searchQuery);
+        } else {
+          return citizen.name.toLowerCase().includes(searchQuery.toLowerCase());
+        }
+      });
       
-      const response = await api.get('/cidadaos/search/', { params: {  q: searchQuery, type: searchType === 'id' ? 'bi' : 'nome' }});
+      setSearchResults(results);
+      setIsSearching(false);
 
-      setSearchResults(response.data.results.map(c => ({
-        id: c.numero_bi_nuit,
-        name: c.full_name,
-        dob: c.data_nascimento,
-        address: `${c.endereco}, ${c.distrito}, ${c.provincia}`
-      })));
-
-      if (response.data.count === 0) {
+      if (results.length === 0) {
         toast({
           title: "Sem resultados",
           description: "Nenhum cidadão encontrado com os critérios especificados.",
         });
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro na pesquisa",
-        description: "Ocorreu um erro ao pesquisar. Tente novamente.",
-      });
-    } finally {
-      setIsSearching(false);
-    }
+    }, 1000);
   };
 
   const handleGenerateRecord = (citizenId: string) => {
@@ -180,7 +172,7 @@ const Search = () => {
                         className="mt-2 md:mt-0 bg-gov-accent hover:bg-gov-accent/90"
                       >
                         <FileText className="mr-2 h-4 w-4" />
-                        Gerar Registo
+                        Gerar Registro
                       </Button>
                     </div>
                   ))}

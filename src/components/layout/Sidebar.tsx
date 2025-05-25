@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
-  { icon: FileText, label: 'Registos', path: '/records' },
+  { icon: FileText, label: 'Registros', path: '/records' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 
@@ -18,8 +18,10 @@ const Sidebar = () => {
   return (
     <aside
       className={cn(
-        "fixed inset-y-0 left-0 z-0 flex flex-col bg-sidebar shadow-xl transition-all duration-300 ease-in-out",
-        isOpen ? "w-64" : "w-[70px]"
+        "fixed inset-y-0 left-0 flex flex-col bg-sidebar shadow-xl transition-all duration-300 ease-in-out z-50",
+        isOpen ? "w-64" : "w-[70px]",
+        "transform sm:translate-x-0 transition-transform",
+        !isOpen && "-translate-x-full sm:translate-x-0"
       )}
     >
       <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
@@ -28,7 +30,7 @@ const Sidebar = () => {
             <div className="bg-white/90 p-1.5 rounded">
               <div className="text-sidebar bg-gov-primary p-0.5 rounded text-xs font-bold">SRC</div>
             </div>
-            <span className="font-semibold text-sidebar-foreground">Registo Criminal</span>
+            <span className="font-semibold text-sidebar-foreground">Registro Criminal</span>
           </div>
         ) : (
           <div className="mx-auto bg-white/90 p-1.5 rounded">
@@ -69,7 +71,7 @@ const Sidebar = () => {
           </div>
           {isOpen && (
             <div>
-              <p className="text-sm font-medium text-sidebar-foreground">Oficial de Registos</p>
+              <p className="text-sm font-medium text-sidebar-foreground">Oficial de Registros</p>
               <p className="text-xs text-sidebar-foreground/70">Online</p>
             </div>
           )}

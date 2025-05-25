@@ -50,3 +50,62 @@
   box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
 }
 
+/* Fix for the sidebar and main content z-index issue */
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar {
+  position: fixed;
+  z-index: 10;
+}
+
+/* Animation for dashboard elements */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Responsive utilities */
+.xs\:block {
+  @media (min-width: 475px) {
+    display: block;
+  }
+}
+
+/* Improve mobile experience */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .sidebar-open {
+    overflow: hidden;
+  }
+}
+
+/* Make sure content doesn't go under sidebar on larger screens */
+@media (min-width: 640px) {
+  .ml-sidebar {
+    margin-left: 70px;
+  }
+  
+  .sidebar-expanded .ml-sidebar {
+    margin-left: 16rem;
+  }
+}
