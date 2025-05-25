@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -17,7 +16,7 @@ import {
   CheckCircle,
   XCircle,
   Download,
-  Print,
+  Printer,
   Shield
 } from 'lucide-react';
 import api from '@/lib/api';
@@ -167,7 +166,7 @@ const RecordDetail = () => {
                 Exportar
               </Button>
               <Button variant="outline" size="sm">
-                <Print className="h-4 w-4 mr-2" />
+                <Printer className="h-4 w-4 mr-2" />
                 Imprimir
               </Button>
             </div>
