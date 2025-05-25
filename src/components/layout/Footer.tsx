@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center gap-2">
         <div>
           <p className="text-sm text-gray-500">
-            © {currentYear} Sistema de Registro Criminal - Ministério da Justiça
+            © {currentYear} Sistema de Registo Criminal - Ministério da Justiça
           </p>
         </div>
         <div className="flex gap-4">

@@ -49,15 +49,15 @@ const RecordGenerate = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [citizenRes, registrosRes] = await Promise.all([
+        const [citizenRes, registosRes] = await Promise.all([
           api.get(`/pesquisar/cidadaos/${id}/`),
           api.get(`/cidadaos/${id}/registos/`)
         ]);
 
         setCitizen({
           ...citizenRes.data,
-          hasCriminalRecord: registrosRes.data.length > 0,
-          recordDetails: registrosRes.data
+          hasCriminalRecord: registosRes.data.length > 0,
+          recordDetails: registosRes.data
         });
 
         // Verifica solicitação existente com certificado
@@ -123,7 +123,7 @@ const RecordGenerate = () => {
       
       toast({
         title: "Solicitação criada",
-        description: "Solicitação de registro criada com sucesso.",
+        description: "Solicitação de registo criada com sucesso.",
       });
       setIsRequestModalOpen(false);
     } catch (error) {
@@ -161,7 +161,7 @@ const RecordGenerate = () => {
     });
 
     // Title
-    page.drawText('CERTIFICADO DE REGISTRO CRIMINAL', {
+    page.drawText('CERTIFICADO DE REGISTO CRIMINAL', {
       x: 50,
       y: height - 120,
       size: 18,
@@ -182,7 +182,7 @@ const RecordGenerate = () => {
 
     // Result
     if (citizen.hasCriminalRecord) {
-      page.drawText('RESULTADO: POSSUI REGISTROS CRIMINAIS', {
+      page.drawText('RESULTADO: POSSUI REGISTOS CRIMINAIS', {
         x: 50,
         y,
         size: 14,
@@ -192,7 +192,7 @@ const RecordGenerate = () => {
       y -= 30;
 
       // Criminal records
-      page.drawText('Detalhes dos Registros:', { x: 50, y, size: 14, font });
+      page.drawText('Detalhes dos Registos:', { x: 50, y, size: 14, font });
       y -= 20;
 
       citizen.recordDetails.forEach((record: any) => {
@@ -208,7 +208,7 @@ const RecordGenerate = () => {
         y -= 25;
       });
     } else {
-      page.drawText('RESULTADO: NÃO POSSUI REGISTROS CRIMINAIS', {
+      page.drawText('RESULTADO: NÃO POSSUI REGISTOS CRIMINAIS', {
         x: 50,
         y,
         size: 14,
@@ -411,9 +411,9 @@ const RecordGenerate = () => {
   return (
     <DashboardLayout>
       <div>
-        <h1 className="text-2xl font-semibold mb-1">Geração de Registro Criminal</h1>
+        <h1 className="text-2xl font-semibold mb-1">Geração de Registo Criminal</h1>
         <p className="text-gray-500 mb-6">
-          Visualize e gere um registro criminal para o cidadão selecionado.
+          Visualize e gere um registo criminal para o cidadão selecionado.
         </p>
 
         <Card className="gov-card mb-6">
@@ -447,21 +447,21 @@ const RecordGenerate = () => {
                   <p className="text-lg">{citizen.endereco}</p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500">Estado do Registro</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Estado do Registo</h3>
                   <div className="flex items-center gap-2 mt-1">
                     {citizen.hasCriminalRecord ? (
                       <>
                         <div className="bg-green-100 p-1 rounded-full">
                           <Check className="h-4 w-4 text-green-600" />
                         </div>
-                        <span className="text-green-600 font-medium">Com Registros Criminais</span>
+                        <span className="text-green-600 font-medium">Com Registos Criminais</span>
                       </>
                     ) : (
                       <>
                         <div className="bg-red-100 p-1 rounded-full">
                           <X className="h-4 w-4 text-red-600" />
                         </div>
-                        <span className="text-red-600 font-medium">Sem Registros Criminais</span>
+                        <span className="text-red-600 font-medium">Sem Registos Criminais</span>
                       </>
                     )}
                   </div>
@@ -473,7 +473,7 @@ const RecordGenerate = () => {
               <>
                 <Separator className="my-6" />
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Detalhes do Registro Criminal</h3>
+                  <h3 className="text-lg font-semibold mb-4">Detalhes do Registo Criminal</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -659,7 +659,7 @@ const RecordGenerate = () => {
           <Card className="gov-card animate-fade-in">
             <CardHeader>
               <CardTitle>Documento Gerado com Sucesso</CardTitle>
-              <CardDescription>Pré-visualização do certificado de registro criminal</CardDescription>
+              <CardDescription>Pré-visualização do certificado de registo criminal</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="border rounded-md p-8 bg-white shadow-sm">
@@ -672,7 +672,7 @@ const RecordGenerate = () => {
                 </div>
                 
                 <div className="text-center mb-8">
-                  <h1 className="text-xl font-bold uppercase">Certificado de Registro Criminal</h1>
+                  <h1 className="text-xl font-bold uppercase">Certificado de Registo Criminal</h1>
                   <p className="text-sm text-gray-500">Documento Oficial - Nº {certificate.numero_referencia}</p>
                 </div>
                 
@@ -707,16 +707,16 @@ const RecordGenerate = () => {
                     {citizen.hasCriminalRecord ? (
                       <div className="bg-red-50 border border-red-100 rounded-md p-4">
                         <p className="font-medium text-red-800">
-                          O cidadão acima identificado POSSUI registros criminais no sistema nacional.
+                          O cidadão acima identificado POSSUI registos criminais no sistema nacional.
                         </p>
                         <p className="text-sm text-red-700 mt-2">
-                          Detalhes dos registros estão incluídos neste certificado.
+                          Detalhes dos registos estão incluídos neste certificado.
                         </p>
                       </div>
                     ) : (
                       <div className="bg-green-50 border border-green-100 rounded-md p-4">
                         <p className="font-medium text-green-800">
-                          O cidadão acima identificado NÃO POSSUI registros criminais no sistema nacional.
+                          O cidadão acima identificado NÃO POSSUI registos criminais no sistema nacional.
                         </p>
                         <p className="text-sm text-green-700 mt-2">
                           Este certificado é válido por 90 dias a partir da data de emissão.
@@ -727,7 +727,7 @@ const RecordGenerate = () => {
                   
                   {citizen.hasCriminalRecord && (
                     <div className="space-y-4">
-                      <h3 className="text-md font-semibold">Detalhes dos Registros:</h3>
+                      <h3 className="text-md font-semibold">Detalhes dos Registos:</h3>
                       {citizen.recordDetails.map((record: any, index: number) => (
                         <div key={index} className="border rounded p-3 bg-gray-50">
                           <div className="grid grid-cols-2 gap-2 text-sm">

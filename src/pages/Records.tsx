@@ -90,22 +90,22 @@ const Records = () => {
   return (
     <DashboardLayout>
       <div>
-        <h1 className="text-2xl font-semibold mb-1">Registros Criminais</h1>
+        <h1 className="text-2xl font-semibold mb-1">Registos Criminais</h1>
         <p className="text-gray-500 mb-6">
-          Visualize e gerencie todos os registros criminais emitidos.
+          Visualize e gerencie todos os registos criminais emitidos.
         </p>
 
         <Card className="gov-card mb-6">
           <CardHeader className="border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <CardTitle>Todos os Registros</CardTitle>
-              <CardDescription>Histórico de certificados de registro criminal emitidos</CardDescription>
+              <CardTitle>Todos os Registos</CardTitle>
+              <CardDescription>Histórico de certificados de registo criminal emitidos</CardDescription>
             </div>
             <div className="w-full sm:w-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="Pesquisar registros..."
+                  placeholder="Pesquisar registos..."
                   className="pl-10 w-full sm:w-[300px]"
                   value={searchTerm}
                   onChange={handleSearchChange}
@@ -155,7 +155,7 @@ const Records = () => {
                               size="icon" 
                               className="h-8 w-8"
                               onClick={() => handleViewRecord(record.cidadao.id)}
-                              title="Ver Registro"
+                              title="Ver Registo"
                             >
                               <FileText className="h-4 w-4" />
                             </Button>
@@ -179,9 +179,9 @@ const Records = () => {
                 <div className="inline-flex items-center justify-center p-4 bg-gray-100 rounded-full mb-4">
                   <FileText className="h-6 w-6 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900">Nenhum registro encontrado</h3>
+                <h3 className="text-lg font-medium text-gray-900">Nenhum registo encontrado</h3>
                 <p className="mt-1 text-gray-500">
-                  Não existem registros que correspondam aos seus critérios de pesquisa.
+                  Não existem registos que correspondam aos seus critérios de pesquisa.
                 </p>
               </div>
             )}
@@ -197,7 +197,7 @@ const Records = () => {
                 </div>
                 <p className="text-2xl font-bold">{stats.total_records}</p>
               </div>
-              <h3 className="mt-4 text-gray-500 font-medium">Total de Registros</h3>
+              <h3 className="mt-4 text-gray-500 font-medium">Total de Registos</h3>
             </CardContent>
           </Card>
           

@@ -7,7 +7,7 @@ import { FileText, User, Search, Check } from 'lucide-react';
 // Mock data
 const stats = [
   {
-    title: 'Registros Emitidos',
+    title: 'Registos Emitidos',
     value: 346,
     icon: FileText,
     color: 'bg-blue-100 text-blue-600',
@@ -28,7 +28,7 @@ const stats = [
     change: '+7%',
   },
   {
-    title: 'Registros Limpos',
+    title: 'Registos Limpos',
     value: 268,
     icon: Check,
     color: 'bg-indigo-100 text-indigo-600',
@@ -70,7 +70,7 @@ const Dashboard = () => {
       <div>
         <h1 className="text-2xl font-semibold mb-1">Painel de Controle</h1>
         <p className="text-gray-500 mb-6">
-          {greeting}, {username}! Bem-vindo ao Sistema de Registro Criminal.
+          {greeting}, {username}! Bem-vindo ao Sistema de Registo Criminal.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -98,7 +98,7 @@ const Dashboard = () => {
           <Card className="gov-card animate-fade-in">
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
-              <CardDescription>Últimos registros criminais processados</CardDescription>
+              <CardDescription>Últimos registos criminais processados</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -145,9 +145,9 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
-                <h4 className="font-medium text-blue-800 mb-1">Processar Novo Registro</h4>
+                <h4 className="font-medium text-blue-800 mb-1">Processar Novo Registo</h4>
                 <p className="text-sm text-blue-700">
-                  Para emitir um novo certificado de registro criminal, comece por pesquisar o cidadão pela página de pesquisa.
+                  Para emitir um novo certificado de registo criminal, comece por pesquisar o cidadão pela página de pesquisa.
                 </p>
               </div>
               
@@ -169,9 +169,9 @@ const Dashboard = () => {
                     <FileText className="h-4 w-4 text-gov-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium">Registros Recentes</h4>
+                    <h4 className="font-medium">Registos Recentes</h4>
                     <p className="text-sm text-gray-500">
-                      Acesse os últimos registros processados
+                      Acesse os últimos registos processados
                     </p>
                   </div>
                 </div>

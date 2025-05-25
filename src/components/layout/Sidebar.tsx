@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
-  { icon: FileText, label: 'Registros', path: '/records' },
+  { icon: FileText, label: 'Registos', path: '/records' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 
@@ -28,7 +28,7 @@ const Sidebar = () => {
             <div className="bg-white/90 p-1.5 rounded">
               <div className="text-sidebar bg-gov-primary p-0.5 rounded text-xs font-bold">SRC</div>
             </div>
-            <span className="font-semibold text-sidebar-foreground">Registro Criminal</span>
+            <span className="font-semibold text-sidebar-foreground">Registo Criminal</span>
           </div>
         ) : (
           <div className="mx-auto bg-white/90 p-1.5 rounded">
@@ -69,7 +69,7 @@ const Sidebar = () => {
           </div>
           {isOpen && (
             <div>
-              <p className="text-sm font-medium text-sidebar-foreground">Oficial de Registros</p>
+              <p className="text-sm font-medium text-sidebar-foreground">Oficial de Registos</p>
               <p className="text-xs text-sidebar-foreground/70">Online</p>
             </div>
           )}

@@ -42,7 +42,7 @@ const Login = () => {
       
       toast({
         title: "Autenticação bem-sucedida",
-        description: "Bem-vindo ao Sistema de Registro Criminal.",
+        description: "Bem-vindo ao Sistema de Registo Criminal.",
       });
     } catch (error) {
       console.error('Login error:', error);
@@ -67,7 +67,7 @@ const Login = () => {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gov-foreground">
-            Sistema de Registro Criminal
+            Sistema de Registo Criminal
           </h1>
           <p className="text-gray-500 mt-2">Ministério da Justiça</p>
         </div>
@@ -76,7 +76,7 @@ const Login = () => {
           <CardHeader>
             <CardTitle>Autenticação de Oficial</CardTitle>
             <CardDescription>
-              Insira as suas credenciais para acessar o sistema de registros criminais.
+              Insira as suas credenciais para acessar o sistema de registos criminais.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleLogin}>
@@ -122,7 +122,7 @@ const Login = () => {
           </form>
         </Card>
         <p className="text-center mt-6 text-sm text-gray-500">
-          © {new Date().getFullYear()} Sistema de Registro Criminal - Todos os direitos reservados
+          © {new Date().getFullYear()} Sistema de Registo Criminal - Todos os direitos reservados
         </p>
       </div>
     </div>

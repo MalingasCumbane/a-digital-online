@@ -10,7 +10,7 @@ const InfoPage = () => {
       <div className="animate-fade-in">
         <h1 className="text-3xl font-bold mb-2 text-gray-800">Informações</h1>
         <p className="text-gray-500 mb-8 text-lg">
-          Detalhes sobre o Sistema de Registro Criminal e procedimentos.
+          Detalhes sobre o Sistema de Registo Criminal e procedimentos.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -24,7 +24,7 @@ const InfoPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
-                O Sistema de Registro Criminal é uma plataforma oficial do Ministério da Justiça para emissão, consulta e gestão de certificados de registo criminal para cidadãos e empresas.
+                O Sistema de Registo Criminal é uma plataforma oficial do Ministério da Justiça para emissão, consulta e gestão de certificados de registo criminal para cidadãos e empresas.
               </p>
             </CardContent>
             <CardFooter>
@@ -44,7 +44,7 @@ const InfoPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
-                Acesse manuais de utilização, tutoriais em vídeo e guias de procedimentos para o Sistema de Registro Criminal.
+                Acesse manuais de utilização, tutoriais em vídeo e guias de procedimentos para o Sistema de Registo Criminal.
               </p>
             </CardContent>
             <CardFooter>
@@ -64,7 +64,7 @@ const InfoPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600">
-                Encontre respostas para as questões mais comuns sobre o processo de emissão de certificados de registro criminal.
+                Encontre respostas para as questões mais comuns sobre o processo de emissão de certificados de registo criminal.
               </p>
             </CardContent>
             <CardFooter>
@@ -77,8 +77,8 @@ const InfoPage = () => {
 
         <Card className="gov-card shadow-md border-l-4 border-l-gov-primary">
           <CardHeader className="pb-2">
-            <CardTitle className="text-2xl text-gray-800">Processo de Emissão de Registro Criminal</CardTitle>
-            <CardDescription className="text-gray-600">Fluxo de trabalho completo para processamento de registros</CardDescription>
+            <CardTitle className="text-2xl text-gray-800">Processo de Emissão de Registo Criminal</CardTitle>
+            <CardDescription className="text-gray-600">Fluxo de trabalho completo para processamento de registos</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-8">
@@ -132,7 +132,7 @@ const InfoPage = () => {
                   <div className="p-4 rounded-lg bg-blue-50 border border-blue-100">
                     <h4 className="font-semibold mb-3 text-blue-800">Validade do Certificado</h4>
                     <p className="text-sm text-gray-700">
-                      Os certificados de registro criminal têm validade de 90 dias a partir da data de emissão.
+                      Os certificados de registo criminal têm validade de 90 dias a partir da data de emissão.
                     </p>
                   </div>
                   
