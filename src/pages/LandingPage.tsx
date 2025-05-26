@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Search, FileText, Shield, Users, LogIn } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import api from '@/lib/api';
+import { Separator } from '@radix-ui/react-separator';
 
 const LandingPage = () => {
   const [recordNumber, setRecordNumber] = useState('');
@@ -16,37 +17,62 @@ const LandingPage = () => {
   const { toast } = useToast();
 
   const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-
-    if (!recordNumber.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Número obrigatório",
-        description: "Por favor, insira um número de registo criminal.",
-      });
-      return;
+  if (!recordNumber.trim()) {
+    toast({
+      variant: "destructive",
+      title: "Número obrigatório",
+      description: "Por favor, insira um número de registo criminal.",
+    });
+    return;
+  }
+  setIsSearching(true);
+  try {
+    const data = {
+      num_ref: recordNumber
     }
-    setIsSearching(true);
-    try {
-      const response = await api.get(`/records/certificate/${recordNumber}/`);
-      setSearchResult(response.data);
-      toast({
-        title: "Registo encontrado",
-        description: "Detalhes do registo criminal carregados com sucesso.",
-      });
-    } catch (error) {
-      console.error('Search error:', error);
-      setSearchResult(null);
-      toast({
-        variant: "destructive",
-        title: "Registo não encontrado",
-        description: "Não foi possível encontrar um registo com esse número.",
-      });
-    } finally {
-      setIsSearching(false);
+    const response = await api.post(`/records/certificate/`, data);
+    
+    // Parse o conteúdo de forma segura
+    let parsedContent = null;
+    if (response.data.conteudo) {
+      try {
+        console.log("ponse.data.conteudo", response.data.conteudo)
+        // Primeiro tenta fazer parse diretamente (caso já seja JSON válido)
+        parsedContent = JSON.parse(response.data.conteudo);
+        
+      } catch (e) {
+        // Se falhar, substitui aspas simples por aspas duplas e tenta novamente
+        const fixedJson = response.data.conteudo
+          .replace(/'/g, '"') // Substitui aspas simples por duplas
+          .replace(/(\w+):/g, '"$1":'); // Adiciona aspas nas chaves
+        parsedContent = JSON.parse(fixedJson);
+      }
     }
-  };
+    
+    const result = {
+      ...response.data,
+      conteudo: parsedContent
+    };
+    
+    setSearchResult(result);
+    toast({
+      title: "Registo encontrado",
+      description: "Detalhes do registo criminal carregados com sucesso.",
+    });
+  } catch (error) {
+    console.error('Search error:', error);
+    setSearchResult(null);
+    toast({
+      variant: "destructive",
+      title: "Erro na pesquisa",
+      description: error.response?.data?.message || "Ocorreu um erro ao processar o registo.",
+    });
+  } finally {
+    setIsSearching(false);
+  }
+};
 
   const handleLogin = () => {
     navigate('/login');
@@ -132,69 +158,144 @@ const LandingPage = () => {
 
         {/* Search Results */}
         {searchResult && (
-          <div className="max-w-2xl mx-auto mb-12">
-            <Card className="shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Detalhes do Registo Criminal
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Número do Registo
-                    </label>
-                    <p className="text-gray-900 font-mono">
-                      {searchResult.record_number || recordNumber}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Nome Completo
-                    </label>
-                    <p className="text-gray-900">
-                      {searchResult.cidadao.full_name || 'N/A'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Estado
-                    </label>
-                    <p className="text-gray-900">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        searchResult.cumprido 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {searchResult.cumprido ? 'Cumprido' : 'Não cumprido'}
-                      </span>
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data de Emissão
-                    </label>
-                    <p className="text-gray-900">
-                      {searchResult.data_ocorrencia || 'N/A'}
-                    </p>
-                  </div>
-                </div>
-                {searchResult.description && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Observações
-                    </label>
-                    <p className="text-gray-900">
-                      {searchResult.description}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+  <div className="max-w-2xl mx-auto mb-12">
+    <Card className="shadow-lg">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="h-5 w-5" />
+          Detalhes do Certificado de Registo Criminal
+        </CardTitle>
+        <CardDescription>
+          Número de referência: {searchResult.numero_referencia}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Estado do Certificado
+            </label>
+            <p className="text-gray-900">
+              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                searchResult.estado_certificado === 'VALIDO' 
+                  ? 'bg-green-100 text-green-800' 
+                  : searchResult.estado_certificado === 'EXPIRADO'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-red-100 text-red-800'
+              }`}>
+                {searchResult.estado_certificado === 'VALIDO' ? 'Válido' : 
+                 searchResult.estado_certificado === 'EXPIRADO' ? 'Expirado' : 'Revogado'}
+              </span>
+            </p>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data de Emissão
+            </label>
+            <p className="text-gray-900">
+              {new Date(searchResult.data_emissao).toLocaleDateString('pt-PT')}
+            </p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Data de Validade
+            </label>
+            <p className="text-gray-900">
+              {new Date(searchResult.data_validade).toLocaleDateString('pt-PT')}
+            </p>
+          </div>
+        </div>
+
+        <Separator className="my-4" />
+
+        {searchResult.conteudo && (
+          <>
+            <h3 className="font-medium text-lg">Dados do Cidadão</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nome Completo
+                </label>
+                <p className="text-gray-900">
+                  {searchResult.conteudo.cidadao?.nome || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Número de BI
+                </label>
+                <p className="text-gray-900">
+                  {searchResult.conteudo.cidadao?.bi || 'N/A'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data de Nascimento
+                </label>
+                <p className="text-gray-900">
+                  {searchResult.conteudo.cidadao?.nascimento ? 
+                    new Date(searchResult.conteudo.cidadao.nascimento).toLocaleDateString('pt-PT') : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nacionalidade
+                </label>
+                <p className="text-gray-900">
+                  {searchResult.conteudo.cidadao?.nacionalidade || 'N/A'}
+                </p>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Endereço
+                </label>
+                <p className="text-gray-900">
+                  {searchResult.conteudo.cidadao?.endereco || 'N/A'}
+                </p>
+              </div>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Possui registos criminais?
+              </label>
+              <p className="text-gray-900">
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  searchResult.conteudo.tem_registos 
+                    ? 'bg-red-100 text-red-800' 
+                    : 'bg-green-100 text-green-800'
+                }`}>
+                  {searchResult.conteudo.tem_registos ? 'Sim' : 'Não'}
+                </span>
+              </p>
+            </div>
+
+            {searchResult.conteudo.tem_registos && searchResult.conteudo.registos?.length > 0 && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Detalhes dos Registos Criminais
+                </label>
+                <div className="space-y-3">
+                  {searchResult.conteudo.registos.map((registo, index) => (
+                    <div key={index} className="border-l-4 border-red-400 pl-4 py-2 bg-red-50 rounded-r">
+                      <p className="font-medium text-red-800">{registo.tipo_ocorrencia}</p>
+                      <p className="text-sm text-red-700">{registo.descricao}</p>
+                      <p className="text-xs text-red-600 mt-1">
+                        {new Date(registo.data_ocorrencia).toLocaleDateString('pt-PT')}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
+      </CardContent>
+    </Card>
+  </div>
+)}
 
         {/* Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

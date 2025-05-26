@@ -1,12 +1,8 @@
-
 import axios from 'axios';
 
-// Base API configuration
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 // const API_URL = "http://162.0.237.160:4522/api";
 
-
-// Create axios instance
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -14,7 +10,6 @@ const api = axios.create({
   },
 });
 
-// Add request interceptor to include auth token in all requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -27,6 +22,7 @@ api.interceptors.request.use((config) => {
 export default api;
 
 export const CriminalRecordsService = {
+
   getAllRecords: async (searchTerm = '') => {
     try {
       const params: { search?: string } = {};
@@ -61,4 +57,5 @@ export const CriminalRecordsService = {
       throw error;
     }
   }
+
 };

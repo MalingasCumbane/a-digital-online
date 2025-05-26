@@ -137,123 +137,6 @@ const RecordGenerate = () => {
     }
   };
 
-  // const generatePDF = async () => {
-  //   if (!citizen) return;
-
-  //   const pdfDoc = await PDFDocument.create();
-  //   const page = pdfDoc.addPage([600, 800]);
-  //   const { width, height } = page.getSize();
-  //   const fontSize = 12;
-  //   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-
-  //   // Header
-  //   page.drawText('REPÚBLICA DE MOÇAMBIQUE', {
-  //     x: 50,
-  //     y: height - 50,
-  //     size: 16,
-  //     font,
-  //     color: rgb(0, 0, 0.8),
-  //   });
-  //   page.drawText('Ministério da Justiça', {
-  //     x: 50,
-  //     y: height - 70,
-  //     size: 14,
-  //     font,
-  //   });
-
-  //   // Title
-  //   page.drawText('CERTIFICADO DE REGISTO CRIMINAL', {
-  //     x: 50,
-  //     y: height - 120,
-  //     size: 18,
-  //     font,
-  //     color: rgb(0, 0, 0.8),
-  //   });
-
-  //   // Citizen data
-  //   let y = height - 180;
-  //   page.drawText(`Nome: ${citizen.full_name}`, { x: 50, y, size: fontSize, font });
-  //   y -= 20;
-  //   page.drawText(`BI/NUIT: ${citizen.numero_bi_nuit}`, { x: 50, y, size: fontSize, font });
-  //   y -= 20;
-  //   page.drawText(`Data Nascimento: ${citizen.data_nascimento}`, { x: 50, y, size: fontSize, font });
-  //   y -= 20;
-  //   page.drawText(`Endereço: ${citizen.endereco}`, { x: 50, y, size: fontSize, font });
-  //   y -= 40;
-
-  //   // Result
-  //   if (citizen.hasCriminalRecord) {
-  //     page.drawText('RESULTADO: POSSUI REGISTOS CRIMINAIS', {
-  //       x: 50,
-  //       y,
-  //       size: 14,
-  //       font,
-  //       color: rgb(0.8, 0, 0),
-  //     });
-  //     y -= 30;
-
-  //     // Criminal records
-  //     page.drawText('Detalhes dos Registos:', { x: 50, y, size: 14, font });
-  //     y -= 20;
-
-  //     citizen.recordDetails.forEach((record: any) => {
-  //       page.drawText(`Processo: ${record.numero_processo}`, { x: 60, y, size: fontSize, font });
-  //       y -= 15;
-  //       page.drawText(`Tribunal: ${record.tribunal}`, { x: 60, y, size: fontSize, font });
-  //       y -= 15;
-  //       page.drawText(`Infração: ${record.tipo_ocorrencia}`, { x: 60, y, size: fontSize, font });
-  //       y -= 15;
-  //       page.drawText(`Sentença: ${record.setenca}`, { x: 60, y, size: fontSize, font });
-  //       y -= 15;
-  //       page.drawText(`Data: ${record.data_ocorrencia}`, { x: 60, y, size: fontSize, font });
-  //       y -= 25;
-  //     });
-  //   } else {
-  //     page.drawText('RESULTADO: NÃO POSSUI REGISTOS CRIMINAIS', {
-  //       x: 50,
-  //       y,
-  //       size: 14,
-  //       font,
-  //       color: rgb(0, 0.6, 0),
-  //     });
-  //     y -= 30;
-  //   }
-
-  //   // Footer
-  //   const today = new Date();
-  //   const validity = new Date();
-  //   validity.setDate(validity.getDate() + 90);
-    
-  //   page.drawText(`Emitido em: ${today.toLocaleDateString()}`, {
-  //     x: 50,
-  //     y: 100,
-  //     size: fontSize,
-  //     font,
-  //   });
-  //   page.drawText(`Válido até: ${validity.toLocaleDateString()}`, {
-  //     x: 50,
-  //     y: 80,
-  //     size: fontSize,
-  //     font,
-  //   });
-
-  //   // Signature
-  //   page.drawText('_________________________', {
-  //     x: width - 200,
-  //     y: 60,
-  //     size: fontSize,
-  //     font,
-  //   });
-  //   page.drawText('Funcionário Responsável', {
-  //     x: width - 200,
-  //     y: 40,
-  //     size: fontSize,
-  //     font,
-  //   });
-
-  //   const pdfBytes = await pdfDoc.save();
-  //   return new Blob([pdfBytes], { type: 'application/pdf' });
-  // };
 
   const generatePDF = async () => {
   if (!citizen) return;
@@ -1037,7 +920,7 @@ const getMonthName = (month: number) => {
                   
                   <div className="text-center text-sm text-gray-500 mt-10 pt-6 border-t">
                     <p>Documento emitido eletronicamente em {new Date(certificate.data_emissao).toLocaleDateString()}</p>
-                    <p className="mt-1">Para validar este certificado, visite <span className="text-gov-primary">www.registocriminal.gov.mz</span> e introduza o código de verificação.</p>
+                    <p className="mt-1">Para validar este certificado, visite <span className="text-gov-primary"><a target='_blank' href='http://localhost:8080/'>http://localhost:8080/</a></span> e introduza o código de verificação.</p>
                     <div className="mt-3 font-mono bg-gray-100 p-2 rounded">
                       {certificate.numero_referencia}
                     </div>
