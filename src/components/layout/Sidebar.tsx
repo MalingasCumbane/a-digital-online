@@ -8,7 +8,7 @@ const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
   { icon: FileText, label: 'Registos', path: '/records' },
-  { icon: FileCheck, label: 'Solicitações de Registo Criminal', path: '/requests' },
+  { icon: FileCheck, label: 'Pedidos', path: '/requests' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 

@@ -31,7 +31,7 @@ const CriminalRecordRequests = () => {
   const fetchRequests = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get('/criminal-record-requests/');
+      const response = await api.get('/all/solicitacoes/');
       setRequests(response.data);
     } catch (error) {
       console.error('Error fetching requests:', error);
@@ -41,36 +41,6 @@ const CriminalRecordRequests = () => {
         description: "Erro ao carregar solicitações.",
       });
       
-      // Mock data para demonstração
-      setRequests([
-        {
-          id: '1',
-          cidadao_nome: 'João Silva',
-          cidadao_bi: '123456789LA050',
-          data_solicitacao: '2024-01-15',
-          status: 'PENDENTE',
-          motivo: 'Solicitação para emprego',
-          cidadao_id: 1
-        },
-        {
-          id: '2',
-          cidadao_nome: 'Maria Santos',
-          cidadao_bi: '987654321LA051',
-          data_solicitacao: '2024-01-14',
-          status: 'EM_PROCESSAMENTO',
-          motivo: 'Processo judicial',
-          cidadao_id: 2
-        },
-        {
-          id: '3',
-          cidadao_nome: 'António Costa',
-          cidadao_bi: '456789123LA052',
-          data_solicitacao: '2024-01-13',
-          status: 'PENDENTE',
-          motivo: 'Emigração',
-          cidadao_id: 3
-        }
-      ]);
     } finally {
       setIsLoading(false);
     }
@@ -81,9 +51,11 @@ const CriminalRecordRequests = () => {
   }, []);
 
   const filteredRequests = requests.filter(request =>
-    request.cidadao_nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    request.cidadao_bi.toLowerCase().includes(searchTerm.toLowerCase())
+    request.cidadao.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    request.cidadao.numero_bi_nuit.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -154,21 +126,21 @@ const CriminalRecordRequests = () => {
                     <div className="flex items-center gap-4 mb-2">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">{request.cidadao_nome}</span>
+                        <span className="font-medium">{request.cidadao.full_name}</span>
                       </div>
-                      <span className="text-sm text-gray-500">BI: {request.cidadao_bi}</span>
-                      {getStatusBadge(request.status)}
+                      <span className="text-sm text-gray-500">BI: {request.cidadao.numero_bi_nuit}</span>
+                      {getStatusBadge(request.estado)}
                     </div>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
                         <span>{new Date(request.data_solicitacao).toLocaleDateString('pt-PT')}</span>
                       </div>
-                      <span>Motivo: {request.motivo}</span>
+                      <span>Motivo: {request.finalidade}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {request.status === 'PENDENTE' && (
+                    {request.estado === 'PENDENTE' && (
                       <Button
                         onClick={() => handleCreateRecord(request)}
                         className="bg-gov-primary hover:bg-gov-secondary"
