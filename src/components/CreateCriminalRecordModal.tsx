@@ -16,11 +16,15 @@ import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import api from '@/lib/api';
 
+type Cidadao = {
+  id: number;
+  full_name: string;
+  numero_bi_nuit: string;
+};
+
 type CriminalRecordRequest = {
   id: string;
-  cidadao_nome: string;
-  cidadao_bi: string;
-  cidadao_id: number;
+  cidadao: Cidadao;
   data_solicitacao: string;
   status: string;
   motivo: string;
@@ -52,9 +56,11 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
     if (!request) return;
 
     setIsSubmitting(true);
+    
     try {
       const data = {
-        cidadao: request.cidadao_id,
+        id: request.id,
+        cidadao: request.cidadao.id,
         numero_processo: formData.numero_processo,
         data_ocorrencia: formData.data_ocorrencia?.toISOString().split('T')[0],
         tipo_ocorrencia: formData.tipo_ocorrencia,
@@ -65,7 +71,9 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
         observacao: formData.observacao
       };
 
-      await api.post('/criminal-records/', data);
+      console.log("DATA ===", data)
+
+      await api.post('/criminal-new-records/', data);
       onRecordCreated();
       
       // Reset form
@@ -101,7 +109,7 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
         <DialogHeader>
           <DialogTitle>Criar Registo Criminal</DialogTitle>
           <DialogDescription>
-            Criando registo criminal para {request?.cidadao_nome} (BI: {request?.cidadao_bi})
+            Criando registo criminal para {request?.cidadao.full_name} (BI: {request?.cidadao.numero_bi_nuit})
           </DialogDescription>
         </DialogHeader>
 
