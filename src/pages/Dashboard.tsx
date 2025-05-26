@@ -28,6 +28,8 @@ const Dashboard = () => {
   const [stats, setStats] = useState<StatCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [tableData, setTableData] = useState([]);
+  
   // const { token } = useAuth();
 
   // Mock data para registros recentes (pode ser substituído por dados reais depois)
@@ -65,6 +67,7 @@ const Dashboard = () => {
         });
         
         const data = response.data;
+        setTableData(response.data.all_registers)
         
         setStats([
           {
@@ -208,26 +211,26 @@ const Dashboard = () => {
                       <th className="pb-2 font-medium">Reg. ID</th>
                       <th className="pb-2 font-medium">Nome</th>
                       <th className="pb-2 font-medium">Data</th>
-                      <th className="pb-2 font-medium">Estado</th>
+                      <th className="pb-2 font-medium">Tipo</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {recentRecords.map((record, index) => (
+                    {tableData.map((record, index) => (
                       <tr 
                         key={record.id}
                         className="border-b last:border-b-0 hover:bg-gray-50 transition-colors animate-slide-in"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
-                        <td className="py-3">{record.id}</td>
-                        <td className="py-3">{record.name}</td>
-                        <td className="py-3">{record.date}</td>
+                        <td className="py-3">{index + 1}</td>
+                        <td className="py-3">{record.cidadao.full_name}</td>
+                        <td className="py-3">{record.data_ocorrencia}</td>
                         <td className="py-3">
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                             record.status === 'Emitido'
                               ? 'bg-green-100 text-green-800'
                               : 'bg-amber-100 text-amber-800'
                           }`}>
-                            {record.status}
+                            {record.tipo_ocorrencia}
                           </span>
                         </td>
                       </tr>
