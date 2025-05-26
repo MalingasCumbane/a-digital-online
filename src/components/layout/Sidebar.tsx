@@ -1,7 +1,6 @@
-
 import { NavLink } from 'react-router-dom';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { Home, Search, FileText, Info, User, Menu, Settings } from 'lucide-react';
+import { Home, Search, FileText, Info, User, Menu, Settings, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -9,12 +8,12 @@ const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
   { icon: FileText, label: 'Registos', path: '/records' },
+  { icon: FileCheck, label: 'Solicitações de Registo Criminal', path: '/requests' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 
 const today = new Date();
 const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
-
 
 const Sidebar = () => {
   const { isOpen, toggleSidebar } = useSidebar();

@@ -12,6 +12,7 @@ import Records from "./pages/Records";
 import RecordGenerate from "./pages/RecordGenerate";
 import RecordDetail from "./pages/RecordDetail";
 import InfoPage from "./pages/Info";
+import CriminalRecordRequests from "./pages/CriminalRecordRequests";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/records" element={<Records />} />
           <Route path="/records/generate/:id" element={<RecordGenerate />} />
           <Route path="/record/:recordNumber" element={<RecordDetail />} />
+          <Route path="/requests" element={<CriminalRecordRequests />} />
           <Route path="/info" element={<InfoPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
