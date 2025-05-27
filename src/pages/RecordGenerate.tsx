@@ -334,7 +334,7 @@ const RecordGenerate = () => {
     color: black,
   });
 
-  page.drawText('O Diretor da Repartição', {
+  page.drawText('O Director da Repartição', {
     x: 50,
     y: 80,
     size: fontSize,
@@ -544,9 +544,9 @@ const getMonthName = (month: number) => {
   return (
     <DashboardLayout>
       <div>
-        <h1 className="text-2xl font-semibold mb-1">Geração de Registo Criminal</h1>
+        <h1 className="text-2xl font-semibold mb-1">Pedido do Certificado de Registo Criminal</h1>
         <p className="text-gray-500 mb-6">
-          Visualize e gere um registo criminal para o cidadão selecionado.
+          Visualize e solicite um certificado de criminal para o cidadão selecionado.
         </p>
 
         <Card className="gov-card mb-6">

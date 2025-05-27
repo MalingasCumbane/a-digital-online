@@ -1,13 +1,33 @@
 import { NavLink } from 'react-router-dom';
 import { useSidebar } from '@/hooks/use-sidebar';
-import { Home, Search, FileText, Info, User, Menu, Settings, FileCheck } from 'lucide-react';
+import { Home, Search, FileText, Info, User, Menu, Settings, FileCheck, Gavel } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import api from '@/lib/api';
 
-const navItems = [
+// Tipos de usuário
+type UserRole = 'dic' | 'court';
+
+// Props do componente
+interface SidebarProps {
+}
+
+interface UserData {
+  description: UserRole;
+}
+
+const registryNavItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
   { icon: FileText, label: 'Registos', path: '/records' },
+  // { icon: FileCheck, label: 'Pedidos', path: '/requests' },
+  { icon: Info, label: 'Informações', path: '/info' },
+];
+
+const courtNavItems = [
+  // { icon: Home, label: 'Dashboard', path: '/dashboard' },
+  // { icon: Gavel, label: 'Processos', path: '/processes' },
   { icon: FileCheck, label: 'Pedidos', path: '/requests' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
@@ -15,8 +35,55 @@ const navItems = [
 const today = new Date();
 const formattedDate = `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`;
 
-const Sidebar = () => {
+const Sidebar = ({}: SidebarProps) => {
   const { isOpen, toggleSidebar } = useSidebar();
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Busca os dados do usuário ao montar o componente
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setLoading(true);
+        const response = await api.post('/user/permission/');
+        setUserData(response.data[0].role);
+      } catch (err) {
+        setError('Falha ao carregar dados do usuário');
+        console.error('Erro ao buscar dados do usuário:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+  
+  console.log("userData: ", userData)
+
+  // Seleciona os itens de navegação com base no tipo de usuário
+  const navItems = userData?.description === 'court' ? courtNavItems : registryNavItems;
+  const userTitle = userData?.description === 'court' ? 'dic' : 'Oficial de Registos';
+
+  if (loading) {
+    return (
+      <aside className="fixed inset-y-0 left-0 z-0 w-[70px] flex flex-col bg-sidebar shadow-xl">
+        <div className="flex items-center justify-center h-16 px-4 border-b border-sidebar-border">
+          <div className="animate-pulse bg-sidebar-accent/50 h-8 w-8 rounded-full"></div>
+        </div>
+      </aside>
+    );
+  }
+
+  if (error || !userData) {
+    return (
+      <aside className="fixed inset-y-0 left-0 z-0 w-[70px] flex flex-col bg-sidebar shadow-xl">
+        <div className="flex items-center justify-center h-16 px-4 border-b border-sidebar-border">
+          <div className="text-xs text-red-500">Erro</div>
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside
@@ -38,7 +105,12 @@ const Sidebar = () => {
             <div className="text-sidebar bg-gov-primary p-0.5 rounded text-xs font-bold">SRC</div>
           </div>
         )}
-        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar} 
+          className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+        >
           <Menu className="h-5 w-5" />
         </Button>
       </div>
@@ -72,8 +144,10 @@ const Sidebar = () => {
           </div>
           {isOpen && (
             <div>
-              <p className="text-sm font-medium text-sidebar-foreground">Oficial de Registos</p>
-              <p className="text-xs text-sidebar-foreground/70">Online</p>
+              <p className="text-sm font-medium text-sidebar-foreground">{userTitle}</p>
+              <p className="text-xs text-sidebar-foreground/70">
+                {userData.name || 'Usuário'} • Online
+              </p>
             </div>
           )}
         </div>
@@ -86,7 +160,7 @@ const Sidebar = () => {
           )}
         >
           <Settings className="h-4 w-4" />
-          {isOpen && <span>GRUPO 3 - {formattedDate}. </span>}
+          {isOpen && <span>GRUPO 3 - {formattedDate}</span>}
         </Button>
       </div>
     </aside>

@@ -180,7 +180,7 @@ const Search = () => {
                         className="mt-2 md:mt-0 bg-gov-accent hover:bg-gov-accent/90"
                       >
                         <FileText className="mr-2 h-4 w-4" />
-                        Gerar Registo
+                        Ver detalhes
                       </Button>
                     </div>
                   ))}
