@@ -38,7 +38,6 @@ const LandingPage = () => {
     let parsedContent = null;
     if (response.data.conteudo) {
       try {
-        console.log("ponse.data.conteudo", response.data.conteudo)
         // Primeiro tenta fazer parse diretamente (caso já seja JSON válido)
         parsedContent = JSON.parse(response.data.conteudo);
         

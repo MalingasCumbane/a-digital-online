@@ -59,9 +59,6 @@ const Sidebar = ({}: SidebarProps) => {
     fetchUserData();
   }, []);
   
-  console.log("userData: ", userData)
-
-  // Seleciona os itens de navegação com base no tipo de usuário
   const navItems = userData?.description === 'court' ? courtNavItems : registryNavItems;
   const userTitle = userData?.description === 'court' ? 'dic' : 'Oficial de Registos';
 

@@ -71,8 +71,6 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
         observacao: formData.observacao
       };
 
-      console.log("DATA ===", data)
-
       await api.post('/criminal-new-records/', data);
       onRecordCreated();
       

@@ -24,8 +24,6 @@ const Login = () => {
         password: password
       }
 
-      console.log("data: ", data)
-
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('isAuthenticated');
