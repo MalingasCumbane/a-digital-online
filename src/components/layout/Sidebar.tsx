@@ -21,13 +21,10 @@ const registryNavItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: Search, label: 'Pesquisar Cidadão', path: '/search' },
   { icon: FileText, label: 'Registos', path: '/records' },
-  // { icon: FileCheck, label: 'Pedidos', path: '/requests' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
 
 const courtNavItems = [
-  // { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  // { icon: Gavel, label: 'Processos', path: '/processes' },
   { icon: FileCheck, label: 'Pedidos', path: '/requests' },
   { icon: Info, label: 'Informações', path: '/info' },
 ];
@@ -60,7 +57,7 @@ const Sidebar = ({}: SidebarProps) => {
   }, []);
   
   const navItems = userData?.description === 'court' ? courtNavItems : registryNavItems;
-  const userTitle = userData?.description === 'court' ? 'dic' : 'Oficial de Registos';
+  const userTitle = userData?.description === 'court' ? 'Tribunal' : 'Oficial de Registos';
 
   if (loading) {
     return (
@@ -143,7 +140,8 @@ const Sidebar = ({}: SidebarProps) => {
             <div>
               <p className="text-sm font-medium text-sidebar-foreground">{userTitle}</p>
               <p className="text-xs text-sidebar-foreground/70">
-                {userData.name || 'Usuário'} • Online
+                {userData.description || 'Usuário'} • Online
+                {console.log("user: ", userData)}
               </p>
             </div>
           )}
