@@ -34,7 +34,8 @@ const RecordGenerate = () => {
     finalidade: 'EMPREGO',
     agencia: '',
     forma_pagamento: 'MBWAY',
-    observacoes: ''
+    observacoes: '',
+    telefone: ''
   });
 
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ const RecordGenerate = () => {
           agencia: formData.agencia,
           forma_pagamento: formData.forma_pagamento,
           observacoes: formData.observacoes,
-
+          telefone: formData.telefone
         });
         
         const requestWithCert = await api.get(`/solicitacoes/${response.data.id}/?expand=certificado`);
@@ -927,6 +928,21 @@ const RecordGenerate = () => {
                   value={formData.agencia}
                   onChange={handleInputChange}
                   className="col-span-3"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="telefone" className="text-right">
+                  Nr. telefone
+                </Label>
+                <Input
+                  id="telefone"
+                  name="telefone"
+                  value={formData.telefone}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  placeholder='+2580000000'
                   required
                 />
               </div>
