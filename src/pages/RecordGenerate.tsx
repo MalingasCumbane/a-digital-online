@@ -106,7 +106,8 @@ const RecordGenerate = () => {
           finalidade: formData.finalidade,
           agencia: formData.agencia,
           forma_pagamento: formData.forma_pagamento,
-          observacoes: formData.observacoes
+          observacoes: formData.observacoes,
+
         });
         
         const requestWithCert = await api.get(`/solicitacoes/${response.data.id}/?expand=certificado`);
@@ -909,6 +910,8 @@ const RecordGenerate = () => {
                   <SelectContent>
                     <SelectItem value="EMPREGO">Emprego</SelectItem>
                     <SelectItem value="VIAGEM">Viagem</SelectItem>
+                    <SelectItem value="VIAGEM">Viagem</SelectItem>
+                    <SelectItem value="CARTACONDUCAO">Carta de condução</SelectItem>
                     <SelectItem value="OUTRO">Outro</SelectItem>
                   </SelectContent>
                 </Select>
@@ -940,9 +943,11 @@ const RecordGenerate = () => {
                     <SelectValue placeholder="Selecione a forma de pagamento" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MBWAY">MBWay</SelectItem>
-                    <SelectItem value="TRANSFERENCIA">Transferência Bancária</SelectItem>
-                    <SelectItem value="DINHEIRO">Dinheiro</SelectItem>
+                    <SelectItem value="EMOLA">Emola</SelectItem>
+                    <SelectItem value="MPESA">M-Pesa</SelectItem>
+                    <SelectItem value="NUMERARIO">Numerário</SelectItem>
+                    <SelectItem value="NUMERARIO">Paypal</SelectItem>
+                    <SelectItem value="NUMERARIO">Visa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
