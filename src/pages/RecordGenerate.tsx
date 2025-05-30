@@ -40,7 +40,7 @@ const RecordGenerate = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  useEffect(() => {
+    useEffect(() => {
     if (!id) {
       navigate('/search');
       return;
@@ -98,8 +98,6 @@ const RecordGenerate = () => {
 
     fetchData();
   }, [id, navigate, toast]);
-
-  // ... (manter as outras funções como generatePDF, handleCreateRequest, etc.)
 
   const handleCreateRequest = async () => {
       try {
@@ -516,6 +514,31 @@ const RecordGenerate = () => {
   return months[month];
 };
 
+    const checkCertificate = async () => {
+    try {
+      const response = await api.get(`/verificar_certificado/${citizen.id}/verif_certificado/`);
+      const { has_request, is_approved, has_certificate, certificate_id } = response.data;
+      
+      if (has_request && is_approved && has_certificate) {
+        const data = {
+          'get_certificate': "get_certificate",
+          'certificate_id': certificate_id
+        }
+
+        const certResponse = await api.post(`/records/certificate/`, data);
+        setCertificate(certResponse.data);
+      }
+    } catch (error) {
+      console.error('Erro ao verificar certificado:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (citizen) {
+      checkCertificate();
+    }
+  }, [citizen]);
+
 
 
   if (loading) {
@@ -755,129 +778,77 @@ const RecordGenerate = () => {
                   </div>
                 )}
               </CardContent>
-              {/* <CardFooter className="bg-gray-50 border-t flex justify-end gap-3">
-                {(!request || (request.cidadao !== citizen.id && request.cidadao?.id !== citizen.id)) ? (
-                  <Button 
-                    onClick={() => setIsRequestModalOpen(true)} 
-                    className="bg-gov-primary hover:bg-gov-secondary"
-                  >
-                    Criar Solicitação
-                  </Button>
-                ) : (
-                  <>
-                    {!certificate ? (
-                      <Button 
-                        onClick={handleGenerateCertificate} 
-                        className="bg-gov-primary hover:bg-gov-secondary"
-                        disabled={generating}
-                      >
-                        {generating ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            A gerar documento...
-                          </>
-                        ) : (
-                          <>
-                            <FileText className="mr-2 h-4 w-4" />
-                            Gerar Documento
-                          </>
-                        )}
-                      </Button>
-                    ) : (
-                      <div className="flex flex-col space-y-3 w-full">
-                        <div className="flex space-x-3">
-                          <Button 
-                            variant="outline"
-                            onClick={handleDownload}
-                            disabled={generating}
-                            className="flex-1"
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Baixar
-                          </Button>
-                          <Button 
-                            onClick={handlePrint}
-                            className="bg-gov-primary hover:bg-gov-secondary flex-1"
-                            disabled={generating}
-                          >
-                            <Printer className="mr-2 h-4 w-4" />
-                            Imprimir
-                          </Button>
-                        </div>
-                        <Button 
-                          variant="outline"
-                          onClick={handleRefreshCertificate}
-                          disabled={generating}
-                        >
-                          <RefreshCw className="mr-2 h-4 w-4" />
-                          Actualizar Dados
-                        </Button>
-                      </div>
-                    )}
-                  </>
-                )}
-              </CardFooter> */}
               <CardFooter className="bg-gray-50 border-t flex justify-end gap-3">
-              {/* Mostrar botão apenas se NÃO tiver registos criminais */}
-              {!citizen.hasCriminalRecord && (!request || (request.cidadao !== citizen.id && request.cidadao?.id !== citizen.id)) ? (
+              {/* Sem solicitação */}
+              {!request && (
                 <Button 
                   onClick={() => setIsRequestModalOpen(true)} 
                   className="bg-gov-primary hover:bg-gov-secondary"
                 >
                   Criar Solicitação
                 </Button>
-              ) : (
-                <>
-                  {!certificate ? (
+              )}
+              
+              {/* Com solicitação não aprovada */}
+              {request && request.estado !== 'APROVADO' && (
+                <div className="flex items-center gap-2 text-orange-600">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Aguardando aprovação do Tribunal</span>
+                </div>
+              )}
+              
+              {/* Solicitação aprovada sem certificado */}
+              {request && request.estado === 'APROVADO' && !certificate && (
+                <Button 
+                  onClick={handleGenerateCertificate} 
+                  className="bg-gov-primary hover:bg-gov-secondary"
+                  disabled={generating}
+                >
+                  {generating ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      A gerar documento...
+                    </>
+                  ) : (
+                    <>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Gerar Documento
+                    </>
+                  )}
+                </Button>
+              )}
+              
+              {/* Com certificado */}
+              {certificate && (
+                <div className="flex flex-col space-y-3 w-full">
+                  <div className="flex space-x-3">
                     <Button 
-                      onClick={handleGenerateCertificate} 
-                      className="bg-gov-primary hover:bg-gov-secondary"
+                      variant="outline"
+                      onClick={handleDownload}
+                      disabled={generating}
+                      className="flex-1"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Baixar
+                    </Button>
+                    <Button 
+                      onClick={handlePrint}
+                      className="bg-gov-primary hover:bg-gov-secondary flex-1"
                       disabled={generating}
                     >
-                      {generating ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          A gerar documento...
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Gerar Documento
-                        </>
-                      )}
+                      <Printer className="mr-2 h-4 w-4" />
+                      Imprimir
                     </Button>
-                  ) : (
-                    <div className="flex flex-col space-y-3 w-full">
-                      <div className="flex space-x-3">
-                        <Button 
-                          variant="outline"
-                          onClick={handleDownload}
-                          disabled={generating}
-                          className="flex-1"
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          Baixar
-                        </Button>
-                        <Button 
-                          onClick={handlePrint}
-                          className="bg-gov-primary hover:bg-gov-secondary flex-1"
-                          disabled={generating}
-                        >
-                          <Printer className="mr-2 h-4 w-4" />
-                          Imprimir
-                        </Button>
-                      </div>
-                      <Button 
-                        variant="outline"
-                        onClick={handleRefreshCertificate}
-                        disabled={generating}
-                      >
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        Actualizar Dados
-                      </Button>
-                    </div>
-                  )}
-                </>
+                  </div>
+                  <Button 
+                    variant="outline"
+                    onClick={handleRefreshCertificate}
+                    disabled={generating}
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Actualizar Dados
+                  </Button>
+                </div>
               )}
             </CardFooter>
             </Card>

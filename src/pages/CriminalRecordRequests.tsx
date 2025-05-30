@@ -169,7 +169,7 @@ const CriminalRecordRequests = () => {
             </CardContent>
           </Card>
         )}
-
+    
         <CreateCriminalRecordModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

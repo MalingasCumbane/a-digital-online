@@ -68,13 +68,13 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
         setenca: formData.setenca,
         data_setenca: formData.data_setenca?.toISOString().split('T')[0],
         cumprido: formData.cumprido,
-        observacao: formData.observacao
+        observacao: formData.observacao,
+        solicitacao: request
       };
 
       await api.post('/criminal-new-records/', data);
       onRecordCreated();
       
-      // Reset form
       setFormData({
         numero_processo: '',
         data_ocorrencia: null,
