@@ -137,7 +137,7 @@ const RecordGenerate = () => {
         setIsRequestModalOpen(false);
       }
     };
-
+// .
     const handleGenerateCertificate = async () => {
         if (!request) return;
         
