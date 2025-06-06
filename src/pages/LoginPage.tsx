@@ -31,12 +31,18 @@ const LoginPage = () => {
       localStorage.removeItem('isAuthenticated');
 
       const response = await api.post('/login/', data);
+      const permiss = await api.post('/user/permission/', data);
 
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       localStorage.setItem('isAuthenticated', 'true');
 
-      navigate('/dashboard');
+      if(permiss.data.description =='dic') {
+        navigate('/dashboard');
+      } else {
+        navigate('/requests');
+      }
+
       
       toast({
         title: "Autenticação bem-sucedida",

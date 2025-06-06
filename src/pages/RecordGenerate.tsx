@@ -911,7 +911,6 @@ const RecordGenerate = () => {
                   <SelectContent>
                     <SelectItem value="EMPREGO">Emprego</SelectItem>
                     <SelectItem value="VIAGEM">Viagem</SelectItem>
-                    <SelectItem value="VIAGEM">Viagem</SelectItem>
                     <SelectItem value="CARTACONDUCAO">Carta de condução</SelectItem>
                     <SelectItem value="OUTRO">Outro</SelectItem>
                   </SelectContent>
@@ -962,8 +961,8 @@ const RecordGenerate = () => {
                     <SelectItem value="EMOLA">Emola</SelectItem>
                     <SelectItem value="MPESA">M-Pesa</SelectItem>
                     <SelectItem value="NUMERARIO">Numerário</SelectItem>
-                    <SelectItem value="NUMERARIO">Paypal</SelectItem>
-                    <SelectItem value="NUMERARIO">Visa</SelectItem>
+                    <SelectItem value="PAYPAL">Paypal</SelectItem>
+                    <SelectItem value="VISA">Visa</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
