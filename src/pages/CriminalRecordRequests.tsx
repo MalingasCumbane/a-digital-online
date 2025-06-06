@@ -140,13 +140,13 @@ const CriminalRecordRequests = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {request.estado === 'PENDENTE' && (
+                    {request.estado === 'APROVADO' && (
                       <Button
                         onClick={() => handleCreateRecord(request)}
                         className="bg-gov-primary hover:bg-gov-secondary"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Criar Registo
+                        Registar ocorrência
                       </Button>
                     )}
                   </div>

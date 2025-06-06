@@ -90,7 +90,7 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Erro ao criar registo criminal.",
+        description: "Erro ao registar ocorrencia.",
       });
     } finally {
       setIsSubmitting(false);
@@ -105,7 +105,7 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Criar Registo Criminal</DialogTitle>
+          <DialogTitle>Registar ocorrência</DialogTitle>
           <DialogDescription>
             Criando registo criminal para {request?.cidadao.full_name} (BI: {request?.cidadao.numero_bi_nuit})
           </DialogDescription>
@@ -255,7 +255,7 @@ const CreateCriminalRecordModal = ({ isOpen, onClose, request, onRecordCreated }
               disabled={isSubmitting}
               className="bg-gov-primary hover:bg-gov-secondary"
             >
-              {isSubmitting ? 'Criando...' : 'Criar Registo'}
+              {isSubmitting ? 'Criando...' : 'Registar'}
             </Button>
           </div>
         </form>

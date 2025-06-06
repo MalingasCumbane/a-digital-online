@@ -132,10 +132,11 @@ const RecordGenerate = () => {
         toast({
           variant: "destructive",
           title: "Erro",
-          description: error.response?.data?.message || "Falha ao criar solicitação.",
+          description: error.response?.data?.message || "Falha ao gerar certificado.",
         });
         setIsRequestModalOpen(false);
       }
+      window.location.reload();
     };
 // .
     const handleGenerateCertificate = async () => {
@@ -787,11 +788,10 @@ const RecordGenerate = () => {
                   onClick={() => setIsRequestModalOpen(true)} 
                   className="bg-gov-primary hover:bg-gov-secondary"
                 >
-                  Criar Solicitação
+                  Gerar certificado
                 </Button>
               )}
               
-              {/* Com solicitação não aprovada */}
               {request && request.estado !== 'APROVADO' && (
                 <div className="flex items-center gap-2 text-orange-600">
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -799,7 +799,6 @@ const RecordGenerate = () => {
                 </div>
               )}
               
-              {/* Solicitação aprovada sem certificado */}
               {request && request.estado === 'APROVADO' && !certificate && (
                 <Button 
                   onClick={handleGenerateCertificate} 
@@ -994,7 +993,7 @@ const RecordGenerate = () => {
                 className="bg-gov-primary hover:bg-gov-secondary"
                 onClick={handleCreateRequest}
               >
-                Criar Solicitação
+                Gerar certificado
               </Button>
             </DialogFooter>
           </DialogContent>

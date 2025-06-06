@@ -141,7 +141,6 @@ const Sidebar = ({}: SidebarProps) => {
               <p className="text-sm font-medium text-sidebar-foreground">{userTitle}</p>
               <p className="text-xs text-sidebar-foreground/70">
                 {userData.description || 'Usuário'} • Online
-                {console.log("user: ", userData)}
               </p>
             </div>
           )}
